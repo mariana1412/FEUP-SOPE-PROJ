@@ -1,2 +1,1 @@
-# FEUP-SOPE-PROJ
-FEUP - SIstemas Operativos - Projetos
+# FEUP - Sistemas Operativos - Projetos
