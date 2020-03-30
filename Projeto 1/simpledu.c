@@ -1,12 +1,5 @@
-#include <stdio.h>
-#include <signal.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <stdlib.h>
-#include "macros.h"
+
 #include "simpledu.h"
-#include <string.h>
-#include <sys/stat.h>
 
 int idArguments(char *arg){
     
@@ -17,28 +10,30 @@ int idArguments(char *arg){
     if(!strcmp(arg, arguments[0]) || !strcmp(arg, arguments[1])){ 
         return ALL;
     }
-    
-    if(!strcmp(arg, arguments[2]) || !strcmp(arg, arguments[3])){ 
+    else if(!strcmp(arg, arguments[2]) || !strcmp(arg, arguments[3])){ 
         return BYTES;
     }
-
-    if(!strcmp(arg, arguments[4]) || !strncmp(arg, arguments[5], 13)){ 
+    else if(!strcmp(arg, arguments[4]) || !strncmp(arg, arguments[5], 13)){ 
         return BLOCK_SIZE;
     }
-    
-    if(!strcmp(arg, arguments[6]) || !strncmp(arg, arguments[7], 13)){ 
+    else if(!strcmp(arg, arguments[6]) || !strncmp(arg, arguments[7], 13)){ 
         return DEREFERENCE;
     }
-
-    if(!strcmp(arg, arguments[8]) || !strncmp(arg, arguments[9], 15)){ 
+    else if(!strcmp(arg, arguments[8]) || !strncmp(arg, arguments[9], 15)){ 
         return DEREFERENCE;
     }
-
-    if(!strncmp(arg, arguments[10], 12)){
+    else if(!strncmp(arg, arguments[10], 12)){
         return MAX_DEPTH;
     }
+    else if(verifyPath(arg) != -1)
+        return PATH;
 
-    return -1;
+    else if(verifyPath(arg) == -1){
+        printf("Error: No such file or directory\n");
+        return -1;
+    }
+    else
+        return -1;
    
 }
 
@@ -48,7 +43,9 @@ int verifyPath(char *path){
     struct stat pathStat;
 
     if(stat(path, &pathStat) < 0)  //invalid path
+    {
         return -1;
+    }
 
     else if(S_ISREG(pathStat.st_mode)) //file
         return 0;
@@ -56,7 +53,7 @@ int verifyPath(char *path){
     else if(S_ISDIR(pathStat.st_mode)) //directory
         return 1;
     
-    
+
     return -1;
 }
 
@@ -78,7 +75,7 @@ int parseArguments(int argc, char *argv[], struct ArgumentFlags *args){ //tem se
     //no caso de idArguments retornar o valor de "-B", obrigatoriamente o argv[seguinte] é um número  
     //no caso de "qualquercoisa= ", é preciso verificar se tem inteiro a seguir
     
-    for(int i = 3; i < argc; i++){
+    for(int i = 2; i < argc; i++){
         int id = idArguments(argv[i]); 
         switch(id){
             case ALL:
@@ -113,10 +110,12 @@ int parseArguments(int argc, char *argv[], struct ArgumentFlags *args){ //tem se
                 args->maxDepth = atoi(num+1);
                 break;
             }
-                
-
+            case PATH:
+                args->path = argv[i];
+                break;
             case -1:
                 return -1;
+
         }
     }
     return 0;
@@ -136,15 +135,18 @@ void checkFlags(struct ArgumentFlags* args){
 int main(int argc, char *argv[], char *envp[]){
     struct ArgumentFlags args;
 
+    initExecReg();
     if (argc == 1 || argc > 10) {   
         printf("Usage: %s -l [path] [-a] [-b] [-B size] [-L] [-S] [--max-depth=N]", argv[0]); 
         exit(1);
     }
-    else if (argc == 2){
-        if(strcmp(argv[1], "-l") != 0) {
-            printf("Usage: %s -l [path] [-a] [-b] [-B size] [-L] [-S] [--max-depth=N]", argv[0]);
-            exit(1);
-        }
+
+    if(strcmp(argv[1], "-l") != 0 && strcmp(argv[1], "--count-links") != 0) {
+        printf("Usage: %s -l [path] [-a] [-b] [-B size] [-L] [-S] [--max-depth=N]", argv[0]);
+        exit(2);
+    }
+
+    if (argc == 2){
         printf("Fazer comando por omissão\n");
         return 0;
         //fazer por omissão -> "simpledu -l"
@@ -160,21 +162,14 @@ int main(int argc, char *argv[], char *envp[]){
         //return 0;
         
     }
-
-    if(strcmp(argv[1], "-l") != 0) {
-        printf("Usage: %s -l [path] [-a] [-b] [-B size] [-L] [-S] [--max-depth=N]", argv[0]);
-        exit(1);
-    }
     
-    if (verifyPath(argv[2]) == -1){//invalid path
-        printf("Error: No such file or directory\n");
-        exit(2);
-    }
+    
     
     initArgumentFlags(&args);
 
     if(parseArguments(argc, argv, &args) != 0){
         printf("Error: There was an error on the provided arguments\n");
+        exit(1);
     }
 
 

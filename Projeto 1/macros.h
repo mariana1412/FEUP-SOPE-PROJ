@@ -8,3 +8,4 @@
 #define DEREFERENCE     3
 #define SEPARATE_DIRS   4
 #define MAX_DEPTH       5
+#define PATH            6

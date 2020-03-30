@@ -1,3 +1,12 @@
+#include <stdio.h>
+#include <signal.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <stdlib.h>
+#include "macros.h"
+#include "reg.h"
+#include <string.h>
+#include <sys/stat.h>
 
 /** @defgroup Simpledu
  * @{
@@ -15,6 +24,7 @@ struct ArgumentFlags{
     int simbolicLinks; // can be either -L or --dereference, follows the simbolic links
     int noSubDir; // can be either -S or --separate-dirs, the displayed info does not include the size of subdirectories
     int maxDepth; // --max-depth=N, limits the displayed info to N (0,1,..) levels of directories depth
+    char *path;// path of 
 }; 
 /**
 * @brief Functions that attributes an integer number to the argument type
