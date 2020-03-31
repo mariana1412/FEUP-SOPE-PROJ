@@ -14,7 +14,6 @@ struct Reg {
     double instant;
 };
 
-
 void initExecReg();
 void fillReg(struct Reg *reg);
 void regCreate(int argc, char *argv[]);
