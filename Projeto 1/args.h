@@ -9,7 +9,7 @@
 #include "macros.h"
 #include <string.h>
 #include <sys/stat.h>
-
+#include <ctype.h>
 struct ArgumentFlags{
     int all; // can be either -a or -all, displays also the information about files
     int bytes; // can be either -b or -bytes, shoes the real number of bytes of data(files) or alocated (directories)
@@ -54,5 +54,7 @@ void initArgumentFlags(struct ArgumentFlags *args);
 void checkFlags(struct ArgumentFlags* args);
 
 struct stat getStat();
+
+char* getArgv(char* dirpath, struct ArgumentFlags *args);
 
 #endif /*ARGS_H*/

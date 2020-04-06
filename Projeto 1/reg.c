@@ -10,7 +10,7 @@ void initExecReg(){
 
     setenv("LOG_FILENAME","reg.txt", 0); 
     reg = getenv("LOG_FILENAME");
-
+    /*caso a variavel nao for definida , nao regista nada */
     if((regFile = fopen(reg,"a"))==NULL){
         perror("Error: Could not open the file \n");
         exit(1);//nao sei se queremos isto

@@ -2,6 +2,15 @@
 
 static struct stat pathStat;
 
+int isNumber(char *n) {
+    int size = sizeof(n)/sizeof(char);
+    for(int i = 0; i<size; i++){
+        if(!isdigit(n[i])) return 0;
+    }
+    return 1;
+}
+
+
 int idArguments(char *arg){
     
     char *arguments[11] = {"-a", "--all", "-b", "--bytes", "-B", "--block-size=", "-L", "--dereference", "-S", "--separate-dirs", "--max-depth="};
@@ -98,12 +107,29 @@ int parseArguments(int argc, char *argv[], struct ArgumentFlags *args){ //tem se
 
             case BLOCK_SIZE:    
                 if(strcmp(argv[i], "-B") == 0) {
-                    i++;
-                    args->blockSize = atoi(argv[i]);
+
+                    if((i+1) < argc)
+                        i++;
+                    else
+                        return -1;
+                    
+                    if(isNumber(argv[i])){
+                        args->blockSize = atoi(argv[i]);
+                    }
+                    else{
+                        return -1;
+                    }
+ 
                 }
                 else {
                     char *num = strstr(argv[i], "=");
-                    args->blockSize = atoi(num+1);
+                    if(isNumber(num+1)){
+                        args->blockSize = atoi(num+1);
+                    }
+                    else{
+                        return -1;
+                    }
+
                 }
                 break;
 
@@ -117,7 +143,13 @@ int parseArguments(int argc, char *argv[], struct ArgumentFlags *args){ //tem se
 
             case MAX_DEPTH: {
                 char *num = strstr(argv[i], "=");
-                args->maxDepth = atoi(num+1);
+                if(isNumber(num+1)){
+                    args->maxDepth = atoi(num+1);
+                }
+                else{
+                    return -1;
+                }
+
                 break;
             }
             case PATH:
@@ -140,4 +172,39 @@ void checkFlags(struct ArgumentFlags* args){
     printf("NoSubDir: %d\n",args->noSubDir);
     printf("MaxDepth: %d\n",args->maxDepth);
     
+}
+
+char* getArgv(char* dirpath, struct ArgumentFlags *args){
+    char* res[9];
+    res[0] = "./simpledu"; //isto esta certo??
+    res[1] = "-l";
+    res[2] = dirpath;
+
+    int i = 3;
+    if(args->all)
+    {
+        res[i] = "-all";
+        i++;
+    }
+    if(args->bytes){
+        res[i] = "-b";
+        i++;
+    }
+    if(args->blockSize != 1024){
+        res[i] = "-B " +  args->blockSize;
+        i++;
+    }
+    if(args->simbolicLinks){
+        res[i] = "-L";
+        i++;
+    }
+    if(args->noSubDir){
+        res[i] = "-S";
+        i++;
+    }
+    if(args->maxDepth){
+        res[i] = "--max-depth=" + args->maxDepth;
+    }
+
+    return *res;
 }
