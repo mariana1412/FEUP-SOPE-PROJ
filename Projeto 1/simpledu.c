@@ -2,6 +2,12 @@
 
 int main(int argc, char *argv[], char *envp[]){
     struct ArgumentFlags args;
+    
+    char pid[10];
+    if (getenv("MAIN_PID") == NULL) {
+        sprintf(pid, "%d", getpid());
+        setenv("MAIN_PID", pid, 0);
+    }   
 
     initExecReg();
     if (argc == 1 || argc > 10) {   
@@ -28,8 +34,8 @@ int main(int argc, char *argv[], char *envp[]){
     }
     checkFlags(&args);
 
-
     display(&args);
+
     return 0; 
 }
 

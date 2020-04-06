@@ -5,6 +5,7 @@ static struct stat pathStat;
 int isNumber(char *n) {
     int size = sizeof(n)/sizeof(char);
     for(int i = 0; i<size; i++){
+        printf("%d  ", n[i]);
         if(!isdigit(n[i])) return 0;
     }
     return 1;
@@ -75,7 +76,7 @@ void initArgumentFlags(struct ArgumentFlags *args){
     args->countLinks = 1;
     args->simbolicLinks = 0;
     args->noSubDir = 0;
-    args->maxDepth = 0;
+    args->maxDepth = INT_MAX;
     args->path = ".";
 }
         //fazer por omissão -> "simpledu -l"
@@ -113,22 +114,26 @@ int parseArguments(int argc, char *argv[], struct ArgumentFlags *args){ //tem se
                     else
                         return -1;
                     
-                    if(isNumber(argv[i])){
-                        args->blockSize = atoi(argv[i]);
+                    args->blockSize = atoi(argv[i]);
+
+                    /*if(isNumber(argv[i])){
+                        
                     }
                     else{
                         return -1;
-                    }
+                    }*/
  
                 }
                 else {
                     char *num = strstr(argv[i], "=");
-                    if(isNumber(num+1)){
-                        args->blockSize = atoi(num+1);
+                     args->blockSize = atoi(num+1);
+
+                    /*if(isNumber(num+1)){
+                       
                     }
                     else{
                         return -1;
-                    }
+                    }*/
 
                 }
                 break;
@@ -143,12 +148,13 @@ int parseArguments(int argc, char *argv[], struct ArgumentFlags *args){ //tem se
 
             case MAX_DEPTH: {
                 char *num = strstr(argv[i], "=");
-                if(isNumber(num+1)){
-                    args->maxDepth = atoi(num+1);
+                args->maxDepth = atoi(num+1);
+                /*if(isNumber(num+1)){
+                    
                 }
                 else{
                     return -1;
-                }
+                }*/
 
                 break;
             }
@@ -175,7 +181,8 @@ void checkFlags(struct ArgumentFlags* args){
 }
 
 char* getArgv(char* dirpath, struct ArgumentFlags *args){
-    char* res[9];
+
+    char* res[10];
     res[0] = "./simpledu"; //isto esta certo??
     res[1] = "-l";
     res[2] = dirpath;
@@ -202,9 +209,12 @@ char* getArgv(char* dirpath, struct ArgumentFlags *args){
         res[i] = "-S";
         i++;
     }
-    if(args->maxDepth){
-        res[i] = "--max-depth=" + args->maxDepth;
+    if(args->maxDepth != INT_MAX){
+        char aux[10];
+        int newdepth = args->maxDepth - 1;
+        sprintf(aux, "%d", newdepth);
+        res[i] = "--max-depth=";
+        strcat(res[i], aux);
     }
-
     return *res;
 }

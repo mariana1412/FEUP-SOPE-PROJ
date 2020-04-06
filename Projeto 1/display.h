@@ -15,8 +15,12 @@
 #include <wait.h>
 
 int bytesToBlocks(int bytes, int blocksize);
-char * buildPath(char * dirname);
+char * buildPath(char * dirname, struct ArgumentFlags * args);
 void display(struct ArgumentFlags *args);
+
+void printFile(struct ArgumentFlags * args, int size, char* name);
+void printDir(struct ArgumentFlags * args, int size, char* name);
+void printLink(struct ArgumentFlags * args, int size, char* name);
 
 
 #endif /*DISPLAY_H*/

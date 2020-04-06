@@ -10,6 +10,8 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <ctype.h>
+#include <limits.h>
+
 struct ArgumentFlags{
     int all; // can be either -a or -all, displays also the information about files
     int bytes; // can be either -b or -bytes, shoes the real number of bytes of data(files) or alocated (directories)
