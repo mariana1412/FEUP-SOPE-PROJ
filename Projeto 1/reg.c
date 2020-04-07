@@ -7,15 +7,15 @@ void initExecReg(){
     char *reg; 
         
     startTime = clock();
-
-    setenv("LOG_FILENAME","reg.txt", 0); 
     reg = getenv("LOG_FILENAME");
-    /*caso a variavel nao for definida , nao regista nada */
-    if((regFile = fopen(reg,"a"))==NULL){
-        perror("Error: Could not open the file \n");
-        exit(1);//nao sei se queremos isto
+    if(reg!= NULL) {
+        /*caso a variavel nao for definida , nao regista nada */
+        if((regFile = fopen(reg,"a"))==NULL){
+            perror("Error: Could not open the file \n");
+            exit(1);//nao sei se queremos isto
+        }
     }
- 
+    printf("Reg = %s, regFile = %s\n", reg, (char*)regFile);
 }
 
 void fillReg(struct Reg *reg){
@@ -24,56 +24,80 @@ void fillReg(struct Reg *reg){
 }   
 
 void regCreate(int argc, char *argv[]){
-   struct Reg reg;
-   fillReg(&reg);
-   char *info = malloc(sizeof(char)*256);
+    if(regFile == NULL)
+        return;
+    struct Reg reg;
+    fillReg(&reg);
+    char *info = malloc(sizeof(char)*256);
 
-   for (int i = 0; i < argc - 1; i++) {
-       strcat(info, argv[i]);
-       strcat(info, " ");
+    for (int i = 0; i < argc - 1; i++) {
+        strcat(info, argv[i]);
+        strcat(info, " ");
     }
-    strcat(info, argv[argc-1]);
+    strcat(info, argv[argc-1]);        
+    fflush(regFile);
     fprintf(regFile, "%.2f - %.8d - CREATE - %s\n", reg.instant, reg.pid, info);
 }
 
 void regExit(int exitStatus){
+    if(regFile == NULL)
+        return;
     struct Reg reg;
 
     fillReg(&reg);
+    fflush(regFile);
     fprintf(regFile, "%.2f - %.8d - EXIT - %d\n", reg.instant, reg.pid, exitStatus);
 }
 
 
 void regRecvSignal(int signal){
+    if(regFile == NULL)
+        return;
     struct Reg reg;
 
     fillReg(&reg);
+    fflush(regFile);
     fprintf(regFile, "%.2f - %.8d - RECV_SIGNAL - %d\n", reg.instant, reg.pid,signal);
 }
 
 void regSendSignal(int signal, pid_t pid){
+    if(regFile == NULL)
+        return;
     struct Reg reg;
     fillReg(&reg);
+    fflush(regFile);
     fprintf(regFile, "%.2f - %.8d - SEND_SIGNAL - Signal %d to % d\n", reg.instant, reg.pid,signal, pid);
 }
 
 void regRecvPipe(char* message){
+    if(regFile == NULL)
+        return;
     struct Reg reg;
     fillReg(&reg);
+    fflush(regFile);
     fprintf(regFile, "%.2f - %.8d - RECV_PIPE - %s\n", reg.instant, reg.pid, message);
 }
 
 void regSendPipe(char* message){
+    if(regFile == NULL)
+        return;
     struct Reg reg;
 
     fillReg(&reg);
+    fflush(regFile);
     fprintf(regFile, "%.2f - %.8d - SEND_PIPE - %s\n", reg.instant, reg.pid, message);
 }
 
-void regEntry(){//do not know número de bytes (ou blocos) seguido do caminho.
+void regEntry(int blocks, char* path){
+    if(regFile == NULL)
+        return;
     struct Reg reg;
-    
+    char *info = malloc(sizeof(char)*256);
+    sprintf(info, "%d", blocks);
+    strcat(info, " ");
+    strcat(info, path);
     fillReg(&reg);
-    fprintf(regFile, "%.2f - %.8d - ENTRY - \n", reg.instant, reg.pid);
+    fflush(regFile);
+    fprintf(regFile, "%.2f - %.8d - ENTRY - %s\n", reg.instant, reg.pid, info);
 }
 

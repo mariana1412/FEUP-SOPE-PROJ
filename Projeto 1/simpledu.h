@@ -10,7 +10,8 @@
 #include <sys/stat.h>
 #include "display.h"
 #include "reg.h"
-//#include "args.h"
+#include <signal.h>
+
 
 /** @defgroup Simpledu
  * @{

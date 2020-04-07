@@ -13,6 +13,7 @@
 #include "args.h"
 #include "macros.h"
 #include <wait.h>
+#include <errno.h>
 
 int bytesToBlocks(int bytes, int blocksize);
 //void buildPath(char* dest, char * dirname, struct ArgumentFlags * args) 

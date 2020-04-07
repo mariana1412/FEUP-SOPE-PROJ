@@ -22,6 +22,6 @@ void regRecvSignal(int signal);
 void regSendSignal(int signal, pid_t pid);
 void regRecvPipe(char* message);
 void regSendPipe(char* message);
-void regEntry();
+void regEntry(int blocks, char* path);
 
 #endif /*REG_H*/

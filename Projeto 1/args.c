@@ -184,7 +184,7 @@ void checkFlags(struct ArgumentFlags* args){
 
 void getArgv(char* dirpath, struct ArgumentFlags *args, char*res[]){
 
-    res[0] = "./simpledu"; //isto esta certo?? (não)
+    res[0] = "simpledu";
     res[1] = "-l";
     res[2] = dirpath;
 
@@ -199,7 +199,7 @@ void getArgv(char* dirpath, struct ArgumentFlags *args, char*res[]){
         i++;
     }
     if(args->blockSize != 1024){
-        res[i] = "-B " +  args->blockSize;
+        res[i] = "-B " +  args->blockSize; /////vai dar erroooooooo
         i++;
     }
     if(args->simbolicLinks){
@@ -212,16 +212,18 @@ void getArgv(char* dirpath, struct ArgumentFlags *args, char*res[]){
     }
     if(args->maxDepth != INT_MAX){
         char aux[10];
+
         int newdepth = args->maxDepth - 1;
         sprintf(aux, "%d", newdepth);
-        res[i] = "--max-depth=";
-        strcat(res[i], aux);
+        char aux2[] = "--max-depth=";
+        strcat(aux2, aux);
+        strcpy(res[i], aux2);
         i++;
     }
    
-   
+
     for(int j = i; j < 11; j++){
-        res[j] = "\0";
+        res[j] = NULL;
     }
     
 }
