@@ -1,5 +1,4 @@
 #include "display.h"
-
 int bytesToBlocks(int bytes, int blocksize) {
     return bytes/blocksize + 1;
 }
@@ -61,8 +60,6 @@ void printLink(struct ArgumentFlags * args, int size, char* name) {
 }
     
 int forkAux(struct ArgumentFlags * args, char * path){
-    //printf("\n Fork \n");
-
     pid_t pid;
     int fd[2];
     pipe(fd);
@@ -81,8 +78,8 @@ int forkAux(struct ArgumentFlags * args, char * path){
 
         execv("./simpledu", arguments);
         printf("Exec failed!\n");
-        
-        //escrever do pipe
+    
+        //escrever para o pipe
     }
     else if(pid > 0) {
         char* auxPath = args->path;
@@ -107,8 +104,9 @@ int forkAux(struct ArgumentFlags * args, char * path){
 void display(struct ArgumentFlags *args) {
     DIR *dir; 
     char *path = args->path;
-    //ssize_t len;
-    //char buf[1024];
+    ssize_t len;
+    char buf[1024];
+    char * filename= malloc(1024);
 
     struct dirent *dentry; 
     printf("\nEntered display with : %s\n", args->path);
@@ -150,12 +148,18 @@ void display(struct ArgumentFlags *args) {
                 break;
             case 2:
                 if(args->simbolicLinks) {
-                   /* if((len=readlink(dentry->d_name,buf,sizeof(buf)-1))!=-1){
-                        buf[len]='\0';
-                        strcat(filename,"/");
-                        strcat(filename,buf);
-                    }*/
                     /*seguir no link*/
+                    if((len=readlink(dentry->d_name,buf,sizeof(buf)-1))!=-1){//building the path to the simbolic link
+                        buf[len]='\0'; 
+                        strcat(filename,buf);
+                        int aux= verifyPath(filename);
+                        if(aux ==1)//if it is a directory
+                            strcat(filename,"/");
+                        printf("Filename: %s",filename);    
+                    }
+                    args->path=filename;
+                    display(args);
+
                 }
                 else{
                     printLink(args, (int)stat_entry.st_size, dentry->d_name);    
