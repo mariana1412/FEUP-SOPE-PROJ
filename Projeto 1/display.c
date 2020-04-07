@@ -62,9 +62,10 @@ void printLink(struct ArgumentFlags * args, int size, char* name) {
     
 int forkAux(struct ArgumentFlags * args, char * path){
     pid_t pid;
-    //int status;
     int fd[2];
     pipe(fd);
+
+    
     printf("Did fork\n");
     if((pid=fork())  < 0)
         fprintf(stderr, "fork error\n");
@@ -77,39 +78,42 @@ int forkAux(struct ArgumentFlags * args, char * path){
         newpath = buildPath(path, args);
         printf("\nI'm here bitches : %s, args.path: %s\n", newpath, args->path);
         getArgv(newpath, args, arguments);
-
-        printf("Entering exec\n");
+        
+        printf("Entering exec\n");        
         execv("./simpledu", arguments);
         printf("Leaving exec\n");
-        //escrever do pipe
+        //escrever do poopies
     }
     else if(pid > 0) {
         char* auxPath = args->path;
         printf("\n entering pai: %s\n", args->path);
         close(fd[WRITE]);
         /*esperar pelo filho e mostrar tamanho?*/
-        if(waitpid(-1,NULL,0) != pid) {
+        if(waitpid(-1, NULL, 0) != pid) {
             fprintf(stderr, "wait error\n");
         }
-        args->path =auxPath;
+        args->path = auxPath;
         printf("\n leaving pai: %s\n", args->path);
         //ler do pipe
     }
+    
+    
     return 0; 
 }
 
 void display(struct ArgumentFlags *args) {
     DIR *dir; 
     char *path = args->path;
+
     struct dirent *dentry; 
-    printf("\nEntered display\n");
+    printf("\nEntered display with : %s\n", args->path);
     
 
     if ((dir = opendir(path)) == NULL) {   //opens a directory returning the stream of it or NULL if error
         perror(path); 
         exit(2);
     }  
-
+    printf("\nThe path before display:  %s\n", path);
     chdir(path);  //changes the directory to path
     printf("Ficheiros regulares do directorio '%s'\n", path);  
 
@@ -122,6 +126,7 @@ void display(struct ArgumentFlags *args) {
         int type = verifyPath(dentry->d_name);
         struct stat stat_entry = getStat(); 
         //char * path;
+        printf("\n\n PATHHHH %s \n\n", dentry->d_name);
 
         switch(type){
             case 0:
@@ -133,7 +138,9 @@ void display(struct ArgumentFlags *args) {
                     if(args->maxDepth){
                         forkAux(args, dentry->d_name);
                     }
+                    
                     printDir(args, (int)stat_entry.st_size, dentry->d_name);  
+                    
                 }  
                 break;
             case 2:

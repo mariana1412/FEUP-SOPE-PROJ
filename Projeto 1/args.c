@@ -184,7 +184,7 @@ void checkFlags(struct ArgumentFlags* args){
 
 void getArgv(char* dirpath, struct ArgumentFlags *args, char*res[]){
 
-    res[0] = "./simpledu"; //isto esta certo??
+    res[0] = "./simpledu"; //isto esta certo?? (não)
     res[1] = "-l";
     res[2] = dirpath;
 
@@ -218,5 +218,10 @@ void getArgv(char* dirpath, struct ArgumentFlags *args, char*res[]){
         strcat(res[i], aux);
         i++;
     }
-    res[i] = NULL;
+   
+   
+    for(int j = i; j < 11; j++){
+        res[j] = "\0";
+    }
+    
 }
