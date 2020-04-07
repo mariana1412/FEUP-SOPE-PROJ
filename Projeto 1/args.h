@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include <ctype.h>
 #include <limits.h>
+#include <linux/limits.h>
 
 struct ArgumentFlags{
     int all; // can be either -a or -all, displays also the information about files
@@ -57,6 +58,6 @@ void checkFlags(struct ArgumentFlags* args);
 
 struct stat getStat();
 
-char* getArgv(char* dirpath, struct ArgumentFlags *args);
+void getArgv(char* dirpath, struct ArgumentFlags *args, char*res[]);
 
 #endif /*ARGS_H*/

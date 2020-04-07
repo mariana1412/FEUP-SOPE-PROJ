@@ -15,6 +15,7 @@
 #include <wait.h>
 
 int bytesToBlocks(int bytes, int blocksize);
+//void buildPath(char* dest, char * dirname, struct ArgumentFlags * args) 
 char * buildPath(char * dirname, struct ArgumentFlags * args);
 void display(struct ArgumentFlags *args);
 

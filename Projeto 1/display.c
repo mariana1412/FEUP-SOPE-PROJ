@@ -5,12 +5,20 @@ int bytesToBlocks(int bytes, int blocksize) {
 }
 
 char * buildPath(char * dirname, struct ArgumentFlags * args) {
-    char *aux = args->path; 
-    strcat(aux, "/");
-    printf("\n1.  %s\t", aux);
+    
+    char *aux = malloc(100);
+    
+    strcpy(aux, args->path);
+    
+    if(aux[strlen(aux)-1] != '/'){
+        strcat(aux, "/");
+    }
+
     strcat(aux, dirname);
-    printf("2.  %s\n", aux);
-    strcat(aux,"/");
+    if(aux[strlen(aux)-1] != '/'){
+        strcat(aux, "/");
+    }
+
     return aux;
 }
 
@@ -54,27 +62,37 @@ void printLink(struct ArgumentFlags * args, int size, char* name) {
     
 int forkAux(struct ArgumentFlags * args, char * path){
     pid_t pid;
-    int status;
+    //int status;
     int fd[2];
     pipe(fd);
-    pid = fork();
-
-    if(pid  < 0)
+    printf("Did fork\n");
+    if((pid=fork())  < 0)
         fprintf(stderr, "fork error\n");
 
     else if(pid == 0) {
+        printf("I'm the child\n");
         close(fd[READ]);
-        //char * arguments = getArgv(path, args);
-        char *arguments[]={"./simpledu","-l","-a",path};
+        char* arguments[11];
+        char *newpath = "";
+        newpath = buildPath(path, args);
+        printf("\nI'm here bitches : %s, args.path: %s\n", newpath, args->path);
+        getArgv(newpath, args, arguments);
+
+        printf("Entering exec\n");
         execv("./simpledu", arguments);
+        printf("Leaving exec\n");
         //escrever do pipe
     }
     else if(pid > 0) {
+        char* auxPath = args->path;
+        printf("\n entering pai: %s\n", args->path);
         close(fd[WRITE]);
         /*esperar pelo filho e mostrar tamanho?*/
-        /*if(waitpid(-1,NULL,0) != pid) {
+        if(waitpid(-1,NULL,0) != pid) {
             fprintf(stderr, "wait error\n");
-        }*/
+        }
+        args->path =auxPath;
+        printf("\n leaving pai: %s\n", args->path);
         //ler do pipe
     }
     return 0; 
@@ -103,7 +121,7 @@ void display(struct ArgumentFlags *args) {
          directory stream.*/ 
         int type = verifyPath(dentry->d_name);
         struct stat stat_entry = getStat(); 
-        char * path;
+        //char * path;
 
         switch(type){
             case 0:
@@ -113,9 +131,7 @@ void display(struct ArgumentFlags *args) {
             case 1:
                 if(strcmp(dentry->d_name, ".")!=0 && strcmp(dentry->d_name, "..")!=0) {
                     if(args->maxDepth){
-                        path = buildPath(dentry->d_name, args);
-                        printf("\nI'm here bitches : %s\n", path);
-                        //forkAux(args, path);
+                        forkAux(args, dentry->d_name);
                     }
                     printDir(args, (int)stat_entry.st_size, dentry->d_name);  
                 }  

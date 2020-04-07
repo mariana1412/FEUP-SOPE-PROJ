@@ -77,7 +77,8 @@ void initArgumentFlags(struct ArgumentFlags *args){
     args->simbolicLinks = 0;
     args->noSubDir = 0;
     args->maxDepth = INT_MAX;
-    args->path = ".";
+    char aux[PATH_MAX];
+    args->path = getcwd(aux, PATH_MAX);
 }
         //fazer por omissão -> "simpledu -l"
         /*
@@ -177,12 +178,12 @@ void checkFlags(struct ArgumentFlags* args){
     printf("SimbolicLinks: %d\n",args->simbolicLinks);
     printf("NoSubDir: %d\n",args->noSubDir);
     printf("MaxDepth: %d\n",args->maxDepth);
+    printf("Path: %s\n", args->path);
     
 }
 
-char* getArgv(char* dirpath, struct ArgumentFlags *args){
+void getArgv(char* dirpath, struct ArgumentFlags *args, char*res[]){
 
-    char* res[10];
     res[0] = "./simpledu"; //isto esta certo??
     res[1] = "-l";
     res[2] = dirpath;
@@ -190,7 +191,7 @@ char* getArgv(char* dirpath, struct ArgumentFlags *args){
     int i = 3;
     if(args->all)
     {
-        res[i] = "-all";
+        res[i] = "-a";
         i++;
     }
     if(args->bytes){
@@ -215,6 +216,7 @@ char* getArgv(char* dirpath, struct ArgumentFlags *args){
         sprintf(aux, "%d", newdepth);
         res[i] = "--max-depth=";
         strcat(res[i], aux);
+        i++;
     }
-    return *res;
+    res[i] = NULL;
 }
