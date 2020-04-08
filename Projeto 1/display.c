@@ -89,6 +89,17 @@ void display(struct ArgumentFlags *args) {
     char line[10];
     int n;
 
+    struct stat stat_entry;
+    if(lstat(path, &stat_entry) < 0)  //invalid path
+        return ;
+    
+    int numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
+    if(args->bytes) {
+        size = (int)stat_entry.st_size;
+    }                
+    else {
+        size = numBlocks;
+    }
 
     if ((dir = opendir(path)) == NULL) {
         perror(path); 
@@ -106,10 +117,10 @@ void display(struct ArgumentFlags *args) {
         strcat(fullpath, dentry->d_name);
         
         int type = verifyPath(fullpath);
-        struct stat stat_entry = getStat(); 
+        stat_entry = getStat(); 
         
-        int numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
-        int filesize;
+        numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
+        int filesize, childsize;
         switch(type){
             case 0:
                 
@@ -122,24 +133,24 @@ void display(struct ArgumentFlags *args) {
                 size += filesize;
                 print(args, filesize, fullpath,0);
                 regEntry(numBlocks, fullpath);
-                //printf("SIZE : %d\n", size);
                 break;
 
             case 1:
-                
                 if(strcmp(dentry->d_name, ".")!=0 && strcmp(dentry->d_name, "..")!=0) {
-                    if(!args->noSubDir) {
-                        if(args->bytes) {
-                            filesize = (int)stat_entry.st_size;
-                        }
-                        else {
-                            filesize = numBlocks;
-                        }
+                    if(args->bytes) {
+                        filesize = (int)stat_entry.st_size;
                     }
+                    else {
+                        filesize = numBlocks;
+                    }
+
                     if(args->maxDepth > 0) {
-                        filesize+=forkAux(args, dentry->d_name,1);
+                        childsize=forkAux(args, dentry->d_name,1);
                     } 
-                    size+=filesize;
+                    if(!args->noSubDir) {
+                        filesize += childsize;
+                        size+=filesize;
+                    }
                     print(args, filesize, fullpath,1);
                     regEntry(numBlocks, fullpath);
                 }  
@@ -156,24 +167,28 @@ void display(struct ArgumentFlags *args) {
                             numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
                             if(aux ==1){//if it is a directory 
                                 strcat(filename,"/");
-                                if(!args->noSubDir) {
-                                    if(args->bytes) {
-                                        filesize = (int)stat_entry.st_size;
-                                    }
-                                    else {
-                                        filesize = numBlocks;
-                                    }
+                                if(args->bytes) {
+                                    filesize = (int)stat_entry.st_size;
                                 }
+                                else {
+                                    filesize = numBlocks;
+                                }
+                            
                                 if(args->maxDepth > 0) {
-                                    filesize+=forkAux(args, dentry->d_name,1);
+                                    childsize=forkAux(args, dentry->d_name,1);
                                 } 
-                                size+=filesize;               
+                                if(!args->noSubDir) {
+                                    filesize += childsize;
+                                    size+=filesize; 
+                                }
+                                              
                                 print(args, filesize, fullpath,2);
                                 free(filename);
                                 regEntry(numBlocks, fullpath);
                                 break;
                             }
                             else if(aux ==0){ //if it is a file
+                                
                                 if(args->bytes) {
                                     filesize = (int)stat_entry.st_size;
                                 }

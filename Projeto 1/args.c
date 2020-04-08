@@ -27,10 +27,10 @@ int idArguments(char *arg){
         return BLOCK_SIZE;
     }
     else if(!strcmp(arg, arguments[6]) || !strncmp(arg, arguments[7], 13)){ 
-        return DEREFERENCE;
+        return DEREFERENCE ;
     }
     else if(!strcmp(arg, arguments[8]) || !strncmp(arg, arguments[9], 15)){ 
-        return DEREFERENCE;
+        return SEPARATE_DIRS ;
     }
     else if(!strncmp(arg, arguments[10], 12)){
         return MAX_DEPTH;
