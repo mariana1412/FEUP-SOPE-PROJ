@@ -1,36 +1,10 @@
 #include "simpledu.h"
-
-void sigint_handler(int signo) {
-    printf("In SIGINT handler ...\n");
-    //aqui vai tratar as confirmações, kills, etc
-
-    char choice;
-
-    kill(-2, SIGSTOP); //acho que isto funciona -> "pausa" todos os processos menos o que está a executar
-
-    while(1){
-        printf("Are you sure do you want to terminate (Y/N)? ");
-        scanf("%s", &choice);
-
-        if(choice == 'Y' || choice == 'y'){
-            printf("\n olá confirmei \n");
-            kill(-2, SIGTERM);
-        }
-        else if(choice == 'N' || choice == 'n'){
-            printf("\n olá continua amor \n");
-            kill(-2, SIGCONT);
-        }
-        else 
-            continue;
-    }
-
-    
-}
-
-
+extern pid_t main_prg;
 int main(int argc, char *argv[], char *envp[]){
     struct ArgumentFlags args;
-    
+ 
+
+    main_prg = getpgrp();
     char pid[10];
     if (getenv("MAIN_PID") == NULL) {
         sprintf(pid, "%d", getpid());
@@ -49,6 +23,8 @@ int main(int argc, char *argv[], char *envp[]){
     }
 
     initExecReg();
+    
+    sleep(10);
     if (argc == 1 || argc > 10) {   
         printf("Usage: %s -l [path] [-a] [-b] [-B size] [-L] [-S] [--max-depth=N]\n", argv[0]); 
         exit(1);

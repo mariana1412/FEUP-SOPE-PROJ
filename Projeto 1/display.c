@@ -1,4 +1,6 @@
 #include "display.h"
+pid_t main_prg;
+pid_t child;
 int bytesToBlocks(int blocks, int blocksize) {
     return blocks * 512 / blocksize;
 }
@@ -20,15 +22,6 @@ void print(struct ArgumentFlags * args, int size, char* name,int type){
         }
     }
     printf("%-4d \t %s\n", size, name);
-    /*int numBlocks = bytesToBlocks(stat_entry.st_blocks, args->blockSize);
-    if(args->bytes){
-        fflush(stdout);
-        printf("%-4d \t %s\n", (int)stat_entry.st_size, name);
-    }
-    else{
-        fflush(stdout);
-        printf("%-4d \t %s\n", numBlocks, name);
-    }*/
 }
 int forkAux(struct ArgumentFlags * args, char * path, int n){
     int childsize = 0;
@@ -42,6 +35,9 @@ int forkAux(struct ArgumentFlags * args, char * path, int n){
         fprintf(stderr, "fork error\n");
 
     else if(pid == 0) {
+        if (getpgrp() == main_prg) {
+            setpgid(pid, getpid());
+        }
         close(fd[READ]);
         dup2(fd[WRITE], STDIN_FILENO);
 
@@ -54,10 +50,10 @@ int forkAux(struct ArgumentFlags * args, char * path, int n){
         getArgv(newpath, args, arguments);
         execv("./simpledu", arguments);
         printf("Exec failed!\n");
-    
-        //escrever para o pipe
     }
+
     else if(pid > 0) {
+        if (getpgrp() == main_prg) { child = pid; }
         if(wait(NULL) != pid) {
             fprintf(stderr, "wait error\n");
         }
@@ -68,10 +64,8 @@ int forkAux(struct ArgumentFlags * args, char * path, int n){
         line[n] ='\0';
         regRecvPipe(line);
         sscanf(line, "%d", &childsize);
- 
- 
+
         args->path = auxPath;
-        //ler do pipe
     }
 
     return childsize; 

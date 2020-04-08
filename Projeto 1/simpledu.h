@@ -9,7 +9,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include "display.h"
-#include <signal.h>
+#include "signals.h"
 
 
 /** @defgroup Simpledu
