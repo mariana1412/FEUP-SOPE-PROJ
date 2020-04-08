@@ -1,25 +1,22 @@
-0.06 - 00015867 - CREATE - ./simpledu -l . -B 2048
-0.29 - 00015867 - ENTRY - 1 ola.txt
-0.20 - 00015868 - CREATE - simpledu -l ./AnotherOne/ -B 2048
-0.32 - 00015868 - EXIT - 0
-0.35 - 00015867 - ENTRY - 1 symblink
-0.10 - 00015871 - CREATE - simpledu -l ./Test/D1/Da/ -B 2048
-0.19 - 00015871 - EXIT - 0
-0.11 - 00015870 - CREATE - simpledu -l ./Test/D1/ -B 2048
-0.09 - 00015873 - CREATE - simpledu -l ./Test/D1/Db/Dx/ -B 2048
-0.19 - 00015873 - EXIT - 0
-0.10 - 00015872 - CREATE - simpledu -l ./Test/D1/Db/ -B 2048
-0.39 - 00015872 - ENTRY - 3 Dx
-0.41 - 00015872 - EXIT - 0
-0.35 - 00015870 - ENTRY - 3 Da
-0.56 - 00015870 - ENTRY - 3 Db
-0.58 - 00015870 - EXIT - 0
-0.13 - 00015869 - CREATE - simpledu -l ./Test/ -B 2048
-0.07 - 00015874 - CREATE - simpledu -l ./Test/D2/ -B 2048
-0.17 - 00015874 - EXIT - 0
-0.38 - 00015869 - ENTRY - 3 D1
-0.51 - 00015869 - ENTRY - 3 D2
-0.53 - 00015869 - EXIT - 0
-0.55 - 00015867 - ENTRY - 3 AnotherOne
-0.74 - 00015867 - ENTRY - 3 Test
-0.77 - 00015867 - EXIT - 0
+0.13 - 00029232 - CREATE - simpledu -l ./Test/D1/Da/ -a -L
+0.21 - 00029232 - ENTRY - 4 ./Test/D1/Da/tounafesta.txt
+0.28 - 00029232 - SEND_PIPE - 4
+0.30 - 00029232 - EXIT - 0
+0.13 - 00029231 - CREATE - ./simpledu -l ./Test/D1 -a -L
+0.32 - 00029231 - RECV_PIPE - 4
+0.11 - 00029234 - CREATE - simpledu -l ./Test/D1/Db/Dx/ -a -L
+0.18 - 00029234 - ENTRY - 4 ./Test/D1/Db/Dx/herewego
+0.26 - 00029234 - ENTRY - 4 ./Test/D1/Db/Dx/toufarta
+0.30 - 00029234 - ENTRY - 0 ./Test/D1/Db/Dx/lnktoAnother
+0.32 - 00029234 - SEND_PIPE - 8
+0.33 - 00029234 - EXIT - 0
+0.16 - 00029233 - CREATE - simpledu -l ./Test/D1/Db/ -a -L
+0.31 - 00029233 - RECV_PIPE - 8
+0.40 - 00029233 - ENTRY - 4 ./Test/D1/Db/Dx
+0.43 - 00029233 - SEND_PIPE - 12
+0.45 - 00029233 - EXIT - 0
+0.40 - 00029231 - ENTRY - 4 ./Test/D1/Da
+0.58 - 00029231 - RECV_PIPE - 12
+0.64 - 00029231 - ENTRY - 4 ./Test/D1/Db
+0.67 - 00029231 - SEND_PIPE - 24
+0.68 - 00029231 - EXIT - 0

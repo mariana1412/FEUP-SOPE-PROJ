@@ -1,0 +1,21 @@
+if(args->simbolicLinks) {
+                    /*seguir no link*/
+                    if((len=readlink(dentry->d_name,buf,sizeof(buf)-1))!=-1){//building the path to the simbolic link
+                        buf[len]='\0'; 
+                        strcat(filename,buf);
+                        int aux= verifyPath(filename);
+                        if(aux ==1){//if it is a directory
+                            strcat(filename,"/");
+                            forkAux(args,filename);
+                        }
+                        else //if it is a file
+                            printFile(args,(int)stat_entry.st_size,filename);
+                        //dont know if we need to check if it is another link
+                        //i think it's all working
+                    }
+
+                }
+                else{
+                    printLink(args, (int)stat_entry.st_size, dentry->d_name);    
+                }
+                break;

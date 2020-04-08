@@ -9,7 +9,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include "display.h"
-#include "reg.h"
 #include <signal.h>
 
 

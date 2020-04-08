@@ -6,19 +6,19 @@ void sigint_handler(int signo) {
 
     char choice;
 
-    kill(-1, SIGSTOP); //acho que isto funciona -> "pausa" todos os processos menos o que está a executar
+    kill(-2, SIGSTOP); //acho que isto funciona -> "pausa" todos os processos menos o que está a executar
 
     while(1){
         printf("Are you sure do you want to terminate (Y/N)? ");
-        scanf("%s", choice);
+        scanf("%s", &choice);
 
         if(choice == 'Y' || choice == 'y'){
             printf("\n olá confirmei \n");
-            kill(-5, SIGTERM);
+            kill(-2, SIGTERM);
         }
         else if(choice == 'N' || choice == 'n'){
             printf("\n olá continua amor \n");
-            kill(-1, SIGCONT);
+            kill(-2, SIGCONT);
         }
         else 
             continue;
@@ -73,9 +73,10 @@ int main(int argc, char *argv[], char *envp[]){
     }
 
     regCreate(argc, argv);
-    checkFlags(&args);
+    //checkFlags(&args);
 
     display(&args);
     regExit(0);
+    unsetenv("MAIN_PID");
     return 0; 
 }

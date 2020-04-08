@@ -9,13 +9,18 @@ void initExecReg(){
     startTime = clock();
     reg = getenv("LOG_FILENAME");
     if(reg!= NULL) {
-        /*caso a variavel nao for definida , nao regista nada */
+        char* parentpid = getenv("MAIN_PID");
+        char pid[10];
+        sprintf(pid, "%d", getpid());
+        if(strcmp(pid, parentpid)==0) {
+            regFile = fopen(reg, "w");
+            fclose(regFile);
+        }
         if((regFile = fopen(reg,"a"))==NULL){
             perror("Error: Could not open the file \n");
-            exit(1);//nao sei se queremos isto
+            exit(1);
         }
     }
-    printf("Reg = %s, regFile = %s\n", reg, (char*)regFile);
 }
 
 void fillReg(struct Reg *reg){
@@ -35,7 +40,7 @@ void regCreate(int argc, char *argv[]){
         strcat(info, " ");
     }
     strcat(info, argv[argc-1]);        
-    fflush(regFile);
+    //fflush(regFile);
     fprintf(regFile, "%.2f - %.8d - CREATE - %s\n", reg.instant, reg.pid, info);
 }
 
@@ -47,6 +52,7 @@ void regExit(int exitStatus){
     fillReg(&reg);
     fflush(regFile);
     fprintf(regFile, "%.2f - %.8d - EXIT - %d\n", reg.instant, reg.pid, exitStatus);
+    fclose(regFile);
 }
 
 

@@ -1,11 +1,9 @@
 #include "display.h"
-int bytesToBlocks(int bytes, int blocksize) {
-    return bytes/blocksize + 1;
+int bytesToBlocks(int blocks, int blocksize) {
+    return blocks * 512 / blocksize;
 }
 
-char * buildPath(char * dirname, struct ArgumentFlags * args) {
-    char *aux = malloc(100);
-
+void buildPath(char * dirname, struct ArgumentFlags * args, char * aux) {
     strcpy(aux, args->path);
     if(aux[strlen(aux)-1] != '/'){
         strcat(aux, "/");
@@ -14,108 +12,88 @@ char * buildPath(char * dirname, struct ArgumentFlags * args) {
     if(aux[strlen(aux)-1] != '/'){
         strcat(aux, "/");
     }
-
-    return aux;
 }
-
-void printFile(struct ArgumentFlags * args, int size, char* name) {
-    if(args->all){
-        int numBlocks = bytesToBlocks(size, args->blockSize);
-        if(args->bytes){
-            fflush(stdout);
-            printf("Bytes: %d, File: %s, PID: %d\n", size, name, getpid());
+void print(struct ArgumentFlags * args, struct stat stat_entry, char* name,int type){
+    if(type==0){
+        if(!args->all){
+            return;
         }
-        else{
-            fflush(stdout);
-            printf("Blocks: %d, File: %s, PID: %d\n", numBlocks, name, getpid());
-        }
-        regEntry(numBlocks, name);
     }
-}
-
-void printDir(struct ArgumentFlags * args, int size, char* name) {
-    int numBlocks = bytesToBlocks(size, args->blockSize); 
-    if(args->bytes){
-        fflush(stdout);            
-        printf("Bytes: %d, Dir: %s, PID: %d\n", size, name, getpid());
-    }
-    else{ 
-        fflush(stdout);                      
-        printf("Blocks: %d, Dir: %s, PID: %d\n", numBlocks, name, getpid());
-    }
-    regEntry(numBlocks, name);
-}
-
-void printLink(struct ArgumentFlags * args, int size, char* name) {
-    int numBlocks = bytesToBlocks(size, args->blockSize);
+    int numBlocks = bytesToBlocks(stat_entry.st_blocks, args->blockSize);
     if(args->bytes){
         fflush(stdout);
-        printf("Bytes: %d, Link: %s\n", size, name);
+        printf("%-4d \t %s\n", (int)stat_entry.st_size, name);
     }
     else{
         fflush(stdout);
-        printf("Blocks: %d, Link: %s\n", numBlocks, name);
+        printf("%-4d \t %s\n", numBlocks, name);
     }
     regEntry(numBlocks, name);
 }
-    
-int forkAux(struct ArgumentFlags * args, char * path){
+int forkAux(struct ArgumentFlags * args, char * path, int n){
+    int childsize = 0;
     pid_t pid;
     int fd[2];
     pipe(fd);
     pid=fork();
+
+    
     if(pid < 0)
         fprintf(stderr, "fork error\n");
 
     else if(pid == 0) {
-        printf("I'm the child\n");
         close(fd[READ]);
-        char* arguments[12];
-        char *newpath = "";
-        newpath = buildPath(path, args);
-        
-        getArgv(newpath, args, arguments);
+        dup2(fd[WRITE], STDIN_FILENO);
 
+        char* arguments[12];
+        char newpath[100];
+        if(n ==1)
+            buildPath(path, args,newpath);
+        else 
+            strcpy(newpath,path);
+        getArgv(newpath, args, arguments);
         execv("./simpledu", arguments);
         printf("Exec failed!\n");
     
         //escrever para o pipe
     }
     else if(pid > 0) {
-        char* auxPath = args->path;
-        printf("\nEntering pai: %s\n", args->path);
-        close(fd[WRITE]);
-        /*esperar pelo filho e mostrar tamanho?*/
-        
-        if(waitpid(-1, NULL, 0) != pid) {
+        if(wait(NULL) != pid) {
             fprintf(stderr, "wait error\n");
         }
-        
+        char* auxPath = args->path;
+        close(fd[WRITE]);
+        char line[10];
+        int n = read(fd[READ], line, 10);
+        line[n] ='\0';
+        regRecvPipe(line);
+        sscanf(line, "%d", &childsize);
+ 
+ 
         args->path = auxPath;
-        printf("\nLeaving pai: %s\n", args->path);
         //ler do pipe
     }
 
-    
-    
-    return 0; 
+    return childsize; 
 }
 
 void display(struct ArgumentFlags *args) {
+    
     DIR *dir; 
     char *path = args->path;
     ssize_t len;
     char buf[1024];
     char * filename= malloc(1024);
-
     struct dirent *dentry; 
-    printf("\nEntered display with : %s\n", args->path);
+    int size=0;
+    char line[10];
+    int n;
 
-    if ((dir = opendir(path)) == NULL) {   //opens a directory returning the stream of it or NULL if error
+
+    if ((dir = opendir(path)) == NULL) {
         perror(path); 
         exit(2);
     }  
-  
 
     while ((dentry = readdir(dir)) != NULL ) { 
         
@@ -126,49 +104,76 @@ void display(struct ArgumentFlags *args) {
             strcat(fullpath, "/");
         }
         strcat(fullpath, dentry->d_name);
-
-        //printf("\nEntered while with : %s , -> %s -> %s\t", args->path, dentry->d_name, fullpath);
+        
         int type = verifyPath(fullpath);
-    
-
         struct stat stat_entry = getStat(); 
+        
         
         switch(type){
             case 0:
-                printFile(args, (int)stat_entry.st_size, dentry->d_name);
+                if(args->bytes) {
+                    size += (int)stat_entry.st_size;
+                }
+                else {
+                    size += bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
+                }
+                print(args, stat_entry, fullpath,0);
+                //printf("SIZE : %d\n", size);
                 break;
 
             case 1:
                 if(strcmp(dentry->d_name, ".")!=0 && strcmp(dentry->d_name, "..")!=0) {
                     if(args->maxDepth > 0) {
-                        forkAux(args, dentry->d_name);
-                    }
-                    printDir(args, (int)stat_entry.st_size, dentry->d_name);  
+                        size+=forkAux(args, dentry->d_name,1);
+                        if(!args->noSubDir) {
+                            if(args->bytes) {
+                                size += (int)stat_entry.st_size;
+                            }
+                            else {
+                                size += bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
+                            }
+                        }
+                    } 
+                    print(args, stat_entry, fullpath,1);
                 }  
+                //print(args, stat_entry, fullpath,1);  
+                //falta printar no fim o diretorio pai de todos e o tamanho
                 break;
             case 2:
-                if(args->simbolicLinks) {
-                    /*seguir no link*/
-                    if((len=readlink(dentry->d_name,buf,sizeof(buf)-1))!=-1){//building the path to the simbolic link
+                if(args->simbolicLinks) { /*seguir no link*/
+                    if((len=readlink(fullpath,buf,sizeof(buf)-1))!=-1){//building the path to the simbolic link
                         buf[len]='\0'; 
                         strcat(filename,buf);
                         int aux= verifyPath(filename);
+                       // printf("Filename: %s \n",filename);
+                        //printf("Fullpath :  %s \n",fullpath);
                         if(aux ==1){//if it is a directory
+                       // printf("Hello!\n");
                             strcat(filename,"/");
-                            forkAux(args,filename);
+                            forkAux(args, fullpath,2);                
+                            print(args, stat_entry, fullpath,2);
+                            free(filename);
                         }
-                        else //if it is a file
-                            printFile(args,(int)stat_entry.st_size,filename);
-                        //dont know if we need to check if it is another link
-                        //i think it's all working
+                        else{ //if it is a file
+                        //printf("Da fuck!\n");
+                            print(args,stat_entry, fullpath,2);
+                            free(filename);
+                        }
+                        //dont know if we need to check if it is another link--we do 
+                        //falta fazer a soma do symblink
                     }
                 }
                 else{
-                    printLink(args, (int)stat_entry.st_size, dentry->d_name);    
+                    print(args, stat_entry, fullpath,2);    
                 }
                 break;
         }
                        
     }
+    sprintf(line, "%d", size);
+    n = strlen(line);
+    printf("sending to pipe: %s\n", line);
+    write(STDIN_FILENO, line, n);
+    regSendPipe(line);
 }
 

@@ -77,8 +77,7 @@ void initArgumentFlags(struct ArgumentFlags *args){
     args->simbolicLinks = 0;
     args->noSubDir = 0;
     args->maxDepth = INT_MAX;
-    char aux[PATH_MAX];
-    args->path = getcwd(aux, PATH_MAX);
+    args->path = ".";
 }
         //fazer por omissão -> "simpledu -l"
         /*

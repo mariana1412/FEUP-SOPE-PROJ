@@ -12,17 +12,15 @@
 #include <limits.h>
 #include "args.h"
 #include "macros.h"
+#include "reg.h"
 #include <wait.h>
 #include <errno.h>
 
-int bytesToBlocks(int bytes, int blocksize);
-//void buildPath(char* dest, char * dirname, struct ArgumentFlags * args) 
-char * buildPath(char * dirname, struct ArgumentFlags * args);
+int bytesToBlocks(int blocks, int blocksize);
+void buildPath(char * dirname, struct ArgumentFlags * args, char * aux);
 void display(struct ArgumentFlags *args);
-
-void printFile(struct ArgumentFlags * args, int size, char* name);
-void printDir(struct ArgumentFlags * args, int size, char* name);
-void printLink(struct ArgumentFlags * args, int size, char* name);
+int forkAux(struct ArgumentFlags * args, char * path,int n);
+void print(struct ArgumentFlags *args, struct stat stat_entry, char* name, int type);
 
 
 #endif /*DISPLAY_H*/
