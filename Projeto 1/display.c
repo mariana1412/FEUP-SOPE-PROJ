@@ -13,13 +13,14 @@ void buildPath(char * dirname, struct ArgumentFlags * args, char * aux) {
         strcat(aux, "/");
     }
 }
-void print(struct ArgumentFlags * args, struct stat stat_entry, char* name,int type){
+void print(struct ArgumentFlags * args, int size, char* name,int type){
     if(type==0){
         if(!args->all){
             return;
         }
     }
-    int numBlocks = bytesToBlocks(stat_entry.st_blocks, args->blockSize);
+    printf("%-4d \t %s\n", size, name);
+    /*int numBlocks = bytesToBlocks(stat_entry.st_blocks, args->blockSize);
     if(args->bytes){
         fflush(stdout);
         printf("%-4d \t %s\n", (int)stat_entry.st_size, name);
@@ -27,8 +28,7 @@ void print(struct ArgumentFlags * args, struct stat stat_entry, char* name,int t
     else{
         fflush(stdout);
         printf("%-4d \t %s\n", numBlocks, name);
-    }
-    regEntry(numBlocks, name);
+    }*/
 }
 int forkAux(struct ArgumentFlags * args, char * path, int n){
     int childsize = 0;
@@ -108,72 +108,113 @@ void display(struct ArgumentFlags *args) {
         int type = verifyPath(fullpath);
         struct stat stat_entry = getStat(); 
         
-        
+        int numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
+        int filesize;
         switch(type){
             case 0:
+                
                 if(args->bytes) {
-                    size += (int)stat_entry.st_size;
+                    filesize = (int)stat_entry.st_size;
                 }
                 else {
-                    size += bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
+                    filesize = numBlocks;
                 }
-                print(args, stat_entry, fullpath,0);
+                size += filesize;
+                print(args, filesize, fullpath,0);
+                regEntry(numBlocks, fullpath);
                 //printf("SIZE : %d\n", size);
                 break;
 
             case 1:
+                
                 if(strcmp(dentry->d_name, ".")!=0 && strcmp(dentry->d_name, "..")!=0) {
-                    if(args->maxDepth > 0) {
-                        size+=forkAux(args, dentry->d_name,1);
-                        if(!args->noSubDir) {
-                            if(args->bytes) {
-                                size += (int)stat_entry.st_size;
-                            }
-                            else {
-                                size += bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
-                            }
+                    if(!args->noSubDir) {
+                        if(args->bytes) {
+                            filesize = (int)stat_entry.st_size;
                         }
+                        else {
+                            filesize = numBlocks;
+                        }
+                    }
+                    if(args->maxDepth > 0) {
+                        filesize+=forkAux(args, dentry->d_name,1);
                     } 
-                    print(args, stat_entry, fullpath,1);
+                    size+=filesize;
+                    print(args, filesize, fullpath,1);
+                    regEntry(numBlocks, fullpath);
                 }  
-                //print(args, stat_entry, fullpath,1);  
-                //falta printar no fim o diretorio pai de todos e o tamanho
+
                 break;
             case 2:
                 if(args->simbolicLinks) { /*seguir no link*/
-                    if((len=readlink(fullpath,buf,sizeof(buf)-1))!=-1){//building the path to the simbolic link
-                        buf[len]='\0'; 
-                        strcat(filename,buf);
-                        int aux= verifyPath(filename);
-                       // printf("Filename: %s \n",filename);
-                        //printf("Fullpath :  %s \n",fullpath);
-                        if(aux ==1){//if it is a directory
-                       // printf("Hello!\n");
-                            strcat(filename,"/");
-                            forkAux(args, fullpath,2);                
-                            print(args, stat_entry, fullpath,2);
-                            free(filename);
+                    while(1){
+                        if((len=readlink(fullpath,buf,sizeof(buf)-1))!=-1){//building the path to the simbolic link
+                            buf[len]='\0'; 
+                            strcat(filename,buf);
+                            int aux= verifyPath(filename);
+                            stat_entry = getStat();
+                            numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
+                            if(aux ==1){//if it is a directory 
+                                strcat(filename,"/");
+                                if(!args->noSubDir) {
+                                    if(args->bytes) {
+                                        filesize = (int)stat_entry.st_size;
+                                    }
+                                    else {
+                                        filesize = numBlocks;
+                                    }
+                                }
+                                if(args->maxDepth > 0) {
+                                    filesize+=forkAux(args, dentry->d_name,1);
+                                } 
+                                size+=filesize;               
+                                print(args, filesize, fullpath,2);
+                                free(filename);
+                                regEntry(numBlocks, fullpath);
+                                break;
+                            }
+                            else if(aux ==0){ //if it is a file
+                                if(args->bytes) {
+                                    filesize = (int)stat_entry.st_size;
+                                }
+                                else {
+                                    filesize = numBlocks;
+                                }
+                                size += filesize;
+                                print(args,size, fullpath,2);
+                                regEntry(numBlocks, fullpath);
+                                free(filename);
+                                break;
+                            }
+                            else if(aux == 2) {
+                                continue;
+                            }
+                            else {
+                                break;
+                            }
+                            //dont know if we need to check if it is another link--we do 
+                            //falta fazer a soma do symblink
                         }
-                        else{ //if it is a file
-                        //printf("Da fuck!\n");
-                            print(args,stat_entry, fullpath,2);
-                            free(filename);
-                        }
-                        //dont know if we need to check if it is another link--we do 
-                        //falta fazer a soma do symblink
                     }
                 }
                 else{
-                    print(args, stat_entry, fullpath,2);    
+                    print(args, size, fullpath,2);    
                 }
                 break;
-        }
-                       
+        }                  
     }
     sprintf(line, "%d", size);
     n = strlen(line);
-    printf("sending to pipe: %s\n", line);
-    write(STDIN_FILENO, line, n);
+    char* parentpid = getenv("MAIN_PID");
+    char pid[10];
+    sprintf(pid, "%d", getpid());
+    if(strcmp(pid, parentpid)) {
+        write(STDIN_FILENO, line, n);
+    } 
+    else {
+       print(args, size, path, 1);
+    }
+    
     regSendPipe(line);
 }
 

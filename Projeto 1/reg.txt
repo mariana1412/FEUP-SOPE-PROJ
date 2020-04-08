@@ -1,22 +1,86 @@
-0.13 - 00029232 - CREATE - simpledu -l ./Test/D1/Da/ -a -L
-0.21 - 00029232 - ENTRY - 4 ./Test/D1/Da/tounafesta.txt
-0.28 - 00029232 - SEND_PIPE - 4
-0.30 - 00029232 - EXIT - 0
-0.13 - 00029231 - CREATE - ./simpledu -l ./Test/D1 -a -L
-0.32 - 00029231 - RECV_PIPE - 4
-0.11 - 00029234 - CREATE - simpledu -l ./Test/D1/Db/Dx/ -a -L
-0.18 - 00029234 - ENTRY - 4 ./Test/D1/Db/Dx/herewego
-0.26 - 00029234 - ENTRY - 4 ./Test/D1/Db/Dx/toufarta
-0.30 - 00029234 - ENTRY - 0 ./Test/D1/Db/Dx/lnktoAnother
-0.32 - 00029234 - SEND_PIPE - 8
-0.33 - 00029234 - EXIT - 0
-0.16 - 00029233 - CREATE - simpledu -l ./Test/D1/Db/ -a -L
-0.31 - 00029233 - RECV_PIPE - 8
-0.40 - 00029233 - ENTRY - 4 ./Test/D1/Db/Dx
-0.43 - 00029233 - SEND_PIPE - 12
-0.45 - 00029233 - EXIT - 0
-0.40 - 00029231 - ENTRY - 4 ./Test/D1/Da
-0.58 - 00029231 - RECV_PIPE - 12
-0.64 - 00029231 - ENTRY - 4 ./Test/D1/Db
-0.67 - 00029231 - SEND_PIPE - 24
-0.68 - 00029231 - EXIT - 0
+0.21 - 00002029 - CREATE - simpledu -l ./symblink/ -a -L
+0.41 - 00002029 - ENTRY - 4 ./symblink/herewego
+0.55 - 00002029 - ENTRY - 4 ./symblink/toufarta
+0.64 - 00002029 - SEND_PIPE - 8
+0.69 - 00002029 - EXIT - 0
+0.18 - 00002021 - CREATE - ./simpledu -l . -a -L
+0.56 - 00002021 - RECV_PIPE - 8
+0.78 - 00002021 - ENTRY - 4 ./symblink
+0.88 - 00002021 - ENTRY - 4 ./reg.h
+0.94 - 00002021 - ENTRY - 8 ./display.o
+1.01 - 00002021 - ENTRY - 4 ./reg.c
+1.05 - 00002021 - ENTRY - 8 ./args.c
+1.09 - 00002021 - ENTRY - 4 ./simpledu.h
+1.12 - 00002021 - ENTRY - 4 ./macros.h
+1.15 - 00002021 - ENTRY - 4 ./args.h
+1.18 - 00002021 - ENTRY - 8 ./display.c
+1.21 - 00002021 - ENTRY - 236 ./PrimeiroProjeto.pdf
+0.21 - 00002030 - CREATE - simpledu -l ./Test/ -a -L
+0.26 - 00002031 - CREATE - simpledu -l ./Test/D2/ -a -L
+0.40 - 00002031 - ENTRY - 4 ./Test/D2/try
+0.50 - 00002031 - SEND_PIPE - 4
+0.53 - 00002031 - EXIT - 0
+0.33 - 00002030 - ENTRY - 4 ./Test/happilydepressed.txt
+0.58 - 00002030 - RECV_PIPE - 4
+0.25 - 00002033 - CREATE - simpledu -l ./Test/D1/Da/ -a -L
+0.37 - 00002033 - ENTRY - 4 ./Test/D1/Da/tounafesta.txt
+0.47 - 00002033 - SEND_PIPE - 4
+0.50 - 00002033 - EXIT - 0
+0.24 - 00002032 - CREATE - simpledu -l ./Test/D1/ -a -L
+0.61 - 00002032 - RECV_PIPE - 4
+0.26 - 00002050 - CREATE - simpledu -l ./Test/D1/Db/Dx/ -a -L
+0.43 - 00002050 - ENTRY - 4 ./Test/D1/Db/Dx/herewego
+0.54 - 00002050 - ENTRY - 4 ./Test/D1/Db/Dx/toufarta
+0.59 - 00002050 - SEND_PIPE - 8
+0.62 - 00002050 - EXIT - 0
+0.20 - 00002041 - CREATE - simpledu -l ./Test/D1/Db/ -a -L
+0.50 - 00002041 - RECV_PIPE - 8
+0.60 - 00002041 - ENTRY - 4 ./Test/D1/Db/Dx
+0.64 - 00002041 - SEND_PIPE - 12
+0.65 - 00002041 - EXIT - 0
+0.80 - 00002032 - ENTRY - 4 ./Test/D1/Da
+1.14 - 00002032 - RECV_PIPE - 12
+1.24 - 00002032 - ENTRY - 4 ./Test/D1/Db
+1.28 - 00002032 - SEND_PIPE - 24
+1.32 - 00002032 - EXIT - 0
+0.73 - 00002030 - ENTRY - 4 ./Test/D2
+1.00 - 00002030 - RECV_PIPE - 24
+1.12 - 00002030 - ENTRY - 4 ./Test/D1
+1.17 - 00002030 - SEND_PIPE - 40
+1.20 - 00002030 - EXIT - 0
+1.24 - 00002021 - ENTRY - 8 ./reg.o
+1.51 - 00002021 - RECV_PIPE - 40
+1.62 - 00002021 - ENTRY - 4 ./Test
+1.67 - 00002021 - ENTRY - 4 ./simpledu.c
+0.17 - 00002051 - CREATE - simpledu -l ./SYMBLINK/ -a -L
+0.13 - 00002052 - CREATE - simpledu -l ./SYMBLINK/Hello/ -a -L
+0.22 - 00002052 - ENTRY - 4 ./SYMBLINK/Hello/tenta
+0.27 - 00002052 - SEND_PIPE - 4
+0.28 - 00002052 - EXIT - 0
+0.26 - 00002051 - ENTRY - 4 ./SYMBLINK/funcionacrlh
+0.44 - 00002051 - RECV_PIPE - 4
+0.53 - 00002051 - ENTRY - 4 ./SYMBLINK/Hello
+0.56 - 00002051 - SEND_PIPE - 12
+0.57 - 00002051 - EXIT - 0
+1.70 - 00002021 - ENTRY - 4 ./display.h
+1.90 - 00002021 - RECV_PIPE - 12
+1.99 - 00002021 - ENTRY - 4 ./SYMBLINK
+2.04 - 00002021 - ENTRY - 4 ./Makefile
+2.06 - 00002021 - ENTRY - 8 ./args.o
+2.09 - 00002021 - ENTRY - 24 ./simpledu
+0.13 - 00002053 - CREATE - simpledu -l ./AnotherOne/ -a -L
+0.09 - 00002054 - CREATE - simpledu -l ./AnotherOne/Hello/ -a -L
+0.16 - 00002054 - ENTRY - 4 ./AnotherOne/Hello/tenta
+0.21 - 00002054 - SEND_PIPE - 4
+0.21 - 00002054 - EXIT - 0
+0.21 - 00002053 - ENTRY - 4 ./AnotherOne/funcionacrlh
+0.36 - 00002053 - RECV_PIPE - 4
+0.45 - 00002053 - ENTRY - 4 ./AnotherOne/Hello
+0.48 - 00002053 - SEND_PIPE - 12
+0.49 - 00002053 - EXIT - 0
+2.11 - 00002021 - ENTRY - 4 ./reg.txt
+2.27 - 00002021 - RECV_PIPE - 12
+2.32 - 00002021 - ENTRY - 4 ./AnotherOne
+2.35 - 00002021 - ENTRY - 8 ./simpledu.o
+2.36 - 00002021 - SEND_PIPE - 432
+2.37 - 00002021 - EXIT - 0

@@ -20,7 +20,7 @@ int bytesToBlocks(int blocks, int blocksize);
 void buildPath(char * dirname, struct ArgumentFlags * args, char * aux);
 void display(struct ArgumentFlags *args);
 int forkAux(struct ArgumentFlags * args, char * path,int n);
-void print(struct ArgumentFlags *args, struct stat stat_entry, char* name, int type);
+void print(struct ArgumentFlags *args, int size, char* name, int type);
 
 
 #endif /*DISPLAY_H*/
