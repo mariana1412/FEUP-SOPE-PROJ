@@ -1,18 +1,19 @@
 #include "simpledu.h"
+
 extern pid_t main_prg;
+
 int main(int argc, char *argv[], char *envp[]){
     struct ArgumentFlags args;
- 
-
-    main_prg = getpgrp();
     char pid[10];
+    struct sigaction action;
+    main_prg = getpgrp();
+
     if (getenv("MAIN_PID") == NULL) {
         sprintf(pid, "%d", getpid());
         setenv("MAIN_PID", pid, 0);
     }   
 
 
-    struct sigaction action;
     action.sa_handler = sigint_handler;
     sigemptyset(&action.sa_mask);
     action.sa_flags = 0;
@@ -25,6 +26,7 @@ int main(int argc, char *argv[], char *envp[]){
     initExecReg();
     
     sleep(10);
+
     if (argc == 1 || argc > 10) {   
         printf("Usage: %s -l [path] [-a] [-b] [-B size] [-L] [-S] [--max-depth=N]\n", argv[0]); 
         exit(1);
@@ -39,7 +41,6 @@ int main(int argc, char *argv[], char *envp[]){
 
     if (argc != 2){
         if(parseArguments(argc, argv, &args) != 0){
-            printf("Error: There was an error on the provided arguments\n");//tirar no fim 
             printf("Usage: %s -l [path] [-a] [-b] [-B size] [-L] [-S] [--max-depth=N]\n", argv[0]);
             exit(1);
         }
@@ -54,5 +55,6 @@ int main(int argc, char *argv[], char *envp[]){
     display(&args);
     regExit(0);
     unsetenv("MAIN_PID");
+    
     return 0; 
 }

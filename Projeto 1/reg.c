@@ -40,7 +40,6 @@ void regCreate(int argc, char *argv[]){
         strcat(info, " ");
     }
     strcat(info, argv[argc-1]);        
-    //fflush(regFile);
     fprintf(regFile, "%.2f - %.8d - CREATE - %s\n", reg.instant, reg.pid, info);
 }
 
