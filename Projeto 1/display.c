@@ -153,13 +153,15 @@ void display(struct ArgumentFlags *args) {
                         buf[len]='\0'; 
                         strcat(filename,buf);
                         int aux= verifyPath(filename);
-                        if(aux ==1)//if it is a directory
+                        if(aux ==1){//if it is a directory
                             strcat(filename,"/");
-                        printf("Filename: %s",filename);    
+                            forkAux(args,filename);
+                        }
+                        else //if it is a file
+                            printFile(args,(int)stat_entry.st_size,filename);
+                        //dont know if we need to check if it is another link
+                        //i think it's all working
                     }
-                    args->path=filename;
-                    display(args);
-
                 }
                 else{
                     printLink(args, (int)stat_entry.st_size, dentry->d_name);    
