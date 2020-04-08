@@ -70,7 +70,7 @@ int forkAux(struct ArgumentFlags * args, char * path){
     else if(pid == 0) {
         printf("I'm the child\n");
         close(fd[READ]);
-        char* arguments[11];
+        char* arguments[12];
         char *newpath = "";
         newpath = buildPath(path, args);
         

@@ -178,8 +178,7 @@ void checkFlags(struct ArgumentFlags* args){
     printf("SimbolicLinks: %d\n",args->simbolicLinks);
     printf("NoSubDir: %d\n",args->noSubDir);
     printf("MaxDepth: %d\n",args->maxDepth);
-    printf("Path: %s\n", args->path);
-    
+    printf("Path: %s\n", args->path);    
 }
 
 void getArgv(char* dirpath, struct ArgumentFlags *args, char*res[]){
@@ -199,7 +198,11 @@ void getArgv(char* dirpath, struct ArgumentFlags *args, char*res[]){
         i++;
     }
     if(args->blockSize != 1024){
-        res[i] = "-B " +  args->blockSize; /////vai dar erroooooooo
+        res[i] = "-B";
+        i++;
+        char aux[10];
+        sprintf(aux, "%d", args->blockSize);
+        res[i] = aux;
         i++;
     }
     if(args->simbolicLinks){
@@ -222,7 +225,7 @@ void getArgv(char* dirpath, struct ArgumentFlags *args, char*res[]){
     }
    
 
-    for(int j = i; j < 11; j++){
+    for(int j = i; j < 12; j++){
         res[j] = NULL;
     }
     

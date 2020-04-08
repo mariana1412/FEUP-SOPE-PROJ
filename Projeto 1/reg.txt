@@ -1,113 +1,25 @@
-0.09 - 00003389 - CREATE - ./simpledu -l . -a --max-depth=2
-0.33 - 00003389 - ENTRY - 1 reg.h
-0.42 - 00003389 - ENTRY - 7 display.o
-0.48 - 00003389 - ENTRY - 3 reg.c
-0.53 - 00003389 - ENTRY - 6 args.c
-0.58 - 00003389 - ENTRY - 1 simpledu.h
-0.62 - 00003389 - ENTRY - 1 macros.h
-0.66 - 00003389 - ENTRY - 3 args.h
-0.71 - 00003389 - ENTRY - 5 display.c
-0.76 - 00003389 - ENTRY - 233 PrimeiroProjeto.pdf
-0.29 - 00003390 - CREATE - simpledu -l ./Test/ -a --max-depth=1
-0.32 - 00003391 - CREATE - simpledu -l ./Test/D2/ -a --max-depth=0
-0.56 - 00003391 - ENTRY - 1 try
-0.64 - 00003391 - EXIT - 0
-0.51 - 00003390 - ENTRY - 1 happilydepressed.txt
-0.24 - 00003392 - CREATE - simpledu -l ./Test/D1/ -a --max-depth=0
-0.49 - 00003392 - ENTRY - 5 Da
-0.57 - 00003392 - ENTRY - 5 Db
-0.60 - 00003392 - EXIT - 0
-0.89 - 00003390 - ENTRY - 5 D2
-1.33 - 00003390 - ENTRY - 5 D1
-1.41 - 00003390 - EXIT - 0
-0.80 - 00003389 - ENTRY - 7 reg.o
-1.16 - 00003389 - ENTRY - 5 Test
-1.25 - 00003389 - ENTRY - 3 simpledu.c
-1.30 - 00003389 - ENTRY - 1 display.h
-1.35 - 00003389 - ENTRY - 1 Makefile
-1.41 - 00003389 - ENTRY - 8 args.o
-1.46 - 00003389 - ENTRY - 23 simpledu
-0.33 - 00003393 - CREATE - simpledu -l ./AnotherOne/ -a --max-depth=1
-0.52 - 00003393 - ENTRY - 1 funcionacrlh
-0.59 - 00003393 - EXIT - 0
-1.51 - 00003389 - ENTRY - 2 reg.txt
-1.93 - 00003389 - ENTRY - 5 AnotherOne
-2.09 - 00003389 - ENTRY - 5 simpledu.o
-2.13 - 00003389 - EXIT - 0
-
-
-0.08 - 00003426 - CREATE - ./simpledu -l . -a --max-depth=3
-0.37 - 00003426 - ENTRY - 1 reg.h
-0.48 - 00003426 - ENTRY - 7 display.o
-0.55 - 00003426 - ENTRY - 3 reg.c
-0.61 - 00003426 - ENTRY - 6 args.c
-0.66 - 00003426 - ENTRY - 1 simpledu.h
-0.71 - 00003426 - ENTRY - 1 macros.h
-0.76 - 00003426 - ENTRY - 3 args.h
-0.80 - 00003426 - ENTRY - 5 display.c
-0.86 - 00003426 - ENTRY - 233 PrimeiroProjeto.pdf
-0.28 - 00003427 - CREATE - simpledu -l ./Test/ -a --max-depth=2
-0.26 - 00003428 - CREATE - simpledu -l ./Test/D2/ -a --max-depth=1
-0.48 - 00003428 - ENTRY - 1 try
-0.56 - 00003428 - EXIT - 0
-0.51 - 00003427 - ENTRY - 1 happilydepressed.txt
-0.32 - 00003429 - CREATE - simpledu -l ./Test/D1/ -a --max-depth=1
-0.09 - 00003432 - CREATE - simpledu -l ./Test/D1/Db/ -a --max-depth=0
-0.17 - 00003432 - ENTRY - 5 Dx
-0.20 - 00003432 - EXIT - 0
-0.91 - 00003429 - ENTRY - 5 Da
-1.18 - 00003429 - ENTRY - 5 Db
-1.22 - 00003429 - EXIT - 0
-0.99 - 00003427 - ENTRY - 5 D2
-1.45 - 00003427 - ENTRY - 5 D1
-1.48 - 00003427 - EXIT - 0
-0.91 - 00003426 - ENTRY - 7 reg.o
-1.28 - 00003426 - ENTRY - 5 Test
-1.32 - 00003426 - ENTRY - 3 simpledu.c
-1.34 - 00003426 - ENTRY - 1 display.h
-1.36 - 00003426 - ENTRY - 1 Makefile
-1.38 - 00003426 - ENTRY - 8 args.o
-1.40 - 00003426 - ENTRY - 23 simpledu
-0.09 - 00003433 - CREATE - simpledu -l ./AnotherOne/ -a --max-depth=2
-0.17 - 00003433 - ENTRY - 1 funcionacrlh
-0.19 - 00003433 - EXIT - 0
-1.42 - 00003426 - ENTRY - 3 reg.txt
-1.55 - 00003426 - ENTRY - 5 AnotherOne
-1.58 - 00003426 - ENTRY - 5 simpledu.o
-1.59 - 00003426 - EXIT - 0
-0.08 - 00006350 - CREATE - ./simpledu -l . -a --max-depth=2
-0.30 - 00006350 - ENTRY - 1 reg.h
-0.40 - 00006350 - ENTRY - 7 display.o
-0.47 - 00006350 - ENTRY - 3 reg.c
-0.52 - 00006350 - ENTRY - 6 args.c
-0.56 - 00006350 - ENTRY - 1 simpledu.h
-0.66 - 00006350 - ENTRY - 1 macros.h
-0.72 - 00006350 - ENTRY - 3 args.h
-0.78 - 00006350 - ENTRY - 5 display.c
-0.83 - 00006350 - ENTRY - 233 PrimeiroProjeto.pdf
-0.24 - 00006351 - CREATE - simpledu -l ./Test/ -a --max-depth=1
-0.31 - 00006352 - CREATE - simpledu -l ./Test/D2/ -a --max-depth=0
-0.57 - 00006352 - ENTRY - 1 try
-0.65 - 00006352 - EXIT - 0
-0.47 - 00006351 - ENTRY - 1 happilydepressed.txt
-0.28 - 00006353 - CREATE - simpledu -l ./Test/D1/ -a --max-depth=0
-0.54 - 00006353 - ENTRY - 5 Da
-0.62 - 00006353 - ENTRY - 5 Db
-0.66 - 00006353 - EXIT - 0
-0.84 - 00006351 - ENTRY - 5 D2
-1.31 - 00006351 - ENTRY - 5 D1
-1.38 - 00006351 - EXIT - 0
-0.87 - 00006350 - ENTRY - 7 reg.o
-1.34 - 00006350 - ENTRY - 5 Test
-1.47 - 00006350 - ENTRY - 3 simpledu.c
-1.54 - 00006350 - ENTRY - 1 display.h
-1.60 - 00006350 - ENTRY - 1 Makefile
-1.65 - 00006350 - ENTRY - 8 args.o
-1.71 - 00006350 - ENTRY - 23 simpledu
-0.28 - 00006354 - CREATE - simpledu -l ./AnotherOne/ -a --max-depth=1
-0.52 - 00006354 - ENTRY - 1 funcionacrlh
-0.58 - 00006354 - EXIT - 0
-1.76 - 00006350 - ENTRY - 4 reg.txt
-2.20 - 00006350 - ENTRY - 5 AnotherOne
-2.31 - 00006350 - ENTRY - 5 simpledu.o
-2.36 - 00006350 - EXIT - 0
+0.06 - 00015867 - CREATE - ./simpledu -l . -B 2048
+0.29 - 00015867 - ENTRY - 1 ola.txt
+0.20 - 00015868 - CREATE - simpledu -l ./AnotherOne/ -B 2048
+0.32 - 00015868 - EXIT - 0
+0.35 - 00015867 - ENTRY - 1 symblink
+0.10 - 00015871 - CREATE - simpledu -l ./Test/D1/Da/ -B 2048
+0.19 - 00015871 - EXIT - 0
+0.11 - 00015870 - CREATE - simpledu -l ./Test/D1/ -B 2048
+0.09 - 00015873 - CREATE - simpledu -l ./Test/D1/Db/Dx/ -B 2048
+0.19 - 00015873 - EXIT - 0
+0.10 - 00015872 - CREATE - simpledu -l ./Test/D1/Db/ -B 2048
+0.39 - 00015872 - ENTRY - 3 Dx
+0.41 - 00015872 - EXIT - 0
+0.35 - 00015870 - ENTRY - 3 Da
+0.56 - 00015870 - ENTRY - 3 Db
+0.58 - 00015870 - EXIT - 0
+0.13 - 00015869 - CREATE - simpledu -l ./Test/ -B 2048
+0.07 - 00015874 - CREATE - simpledu -l ./Test/D2/ -B 2048
+0.17 - 00015874 - EXIT - 0
+0.38 - 00015869 - ENTRY - 3 D1
+0.51 - 00015869 - ENTRY - 3 D2
+0.53 - 00015869 - EXIT - 0
+0.55 - 00015867 - ENTRY - 3 AnotherOne
+0.74 - 00015867 - ENTRY - 3 Test
+0.77 - 00015867 - EXIT - 0
