@@ -21,6 +21,6 @@ void buildPath(char * dirname, struct ArgumentFlags * args, char * aux);
 void display(struct ArgumentFlags *args);
 int forkAux(struct ArgumentFlags * args, char * path,int n);
 void print(struct ArgumentFlags *args, int size, char* name, int type);
-
-
+void printFile(struct ArgumentFlags *args, struct stat stat_entry, int *size, char fullpath[], int simblink);
+void printDir(struct ArgumentFlags *args, struct stat stat_entry, struct dirent *dentry, int *size, char fullpath[], int simblink);
 #endif /*DISPLAY_H*/
