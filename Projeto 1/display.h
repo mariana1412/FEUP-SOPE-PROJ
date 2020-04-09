@@ -17,6 +17,7 @@
 #include <errno.h>
 
 int bytesToBlocks(int blocks, int blocksize);
+int toBlocks(int bytes, int blocksize);
 void buildPath(char * dirname, struct ArgumentFlags * args, char * aux);
 void display(struct ArgumentFlags *args);
 int forkAux(struct ArgumentFlags * args, char * path,int n);

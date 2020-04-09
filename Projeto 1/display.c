@@ -2,9 +2,21 @@
 pid_t main_prg;
 pid_t child;
 
-int bytesToBlocks(int blocks, int blocksize)
+int to4096Blocks(int bytes)
 {
-    return blocks * 512 / blocksize;
+    if(bytes%4096)
+        return bytes/4096 + 1;
+    else
+        return bytes/4096;
+    
+}
+
+int blocksToBlocks(int blocks, int blocksize) {
+    int n = blocks*4096;
+    if(n%blocksize)
+        return n/blocksize +1;
+    else
+        return n/blocksize;
 }
 
 void buildPath(char *dirname, struct ArgumentFlags *args, char *aux)
@@ -112,16 +124,10 @@ void display(struct ArgumentFlags *args)
     {
         if (lstat(path, &stat_entry) < 0) //invalid path
             return;
-
-        numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
         if (args->bytes)
-        {
             size = (int)stat_entry.st_size;
-        }
         else
-        {
-            size = numBlocks;
-        }
+            size = to4096Blocks((int)stat_entry.st_size);
     }
     if ((dir = opendir(path)) == NULL)
     {
@@ -144,7 +150,6 @@ void display(struct ArgumentFlags *args)
         int type = verifyPath(fullpath);
         stat_entry = getStat();
 
-        numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
         int filesize = 0;
 
         switch (type)
@@ -169,7 +174,7 @@ void display(struct ArgumentFlags *args)
                         strcat(filename, buf);
                         int aux = verifyPath(filename);
                         stat_entry = getStat();
-                        
+
                         if (aux == 1)
                         { //if it is a directory
                             printDir(args, stat_entry, dentry, &size, fullpath, 2);
@@ -184,13 +189,22 @@ void display(struct ArgumentFlags *args)
                         }
                         else if (aux == 2)
                         {
+                            if (args->bytes) {
+                                print(args, size, fullpath, 2);
+                                regEntry(size, fullpath);
+                            }
+                            else {
+                                numBlocks = to4096Blocks(size);
+                                print(args, blocksToBlocks(numBlocks, args->blockSize), fullpath, 2);
+                                regEntry(blocksToBlocks(numBlocks, args->blockSize), fullpath);
+                            }
                             continue;
                         }
                         else
                         {
                             break;
                         }
-                        
+
                         //dont know if we need to check if it is another link--we do
                     }
                 }
@@ -198,7 +212,17 @@ void display(struct ArgumentFlags *args)
             else
             {
                 if (args->all)
-                    print(args, filesize, fullpath, 2);
+                {
+                    if (args->bytes) {
+                        print(args, filesize, fullpath, 2);
+                        regEntry(filesize, fullpath);
+                    }
+                    else {
+                        numBlocks = to4096Blocks(filesize);
+                        print(args, blocksToBlocks(numBlocks, args->blockSize), fullpath, 2);
+                        regEntry(blocksToBlocks(numBlocks, args->blockSize), fullpath);
+                    }
+                }
             }
             break;
         }
@@ -208,61 +232,59 @@ void display(struct ArgumentFlags *args)
     n = strlen(line);
     if (strcmp(pid, parentpid))
     {
+        regSendPipe(line);
         write(STDIN_FILENO, line, n);
     }
     else
     {
-        print(args, size, path, 1);
+        if (args->bytes) {
+            print(args, size, path, 1);
+            regEntry(size, path);
+        }
+        else {
+            print(args, blocksToBlocks(size, args->blockSize), path, 1);
+            regEntry(blocksToBlocks(size, args->blockSize), path);
+        }
     }
-
-    regSendPipe(line);
 }
 
 void printFile(struct ArgumentFlags *args, struct stat stat_entry, int *size, char fullpath[], int simblink)
 {
-    int filesize;
-    int numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
+    int filesize; 
     if (args->bytes)
-    {
         filesize = (int)stat_entry.st_size;
-    }
     else
-    {
-        filesize = numBlocks;
-    }
+        filesize = to4096Blocks((int)stat_entry.st_size);
     *size += filesize;
+    if(!args->bytes)
+        filesize = blocksToBlocks(filesize, args->blockSize);
     print(args, filesize, fullpath, simblink);
-    regEntry(numBlocks, fullpath);
+    regEntry(filesize, fullpath);
 }
 
 void printDir(struct ArgumentFlags *args, struct stat stat_entry, struct dirent *dentry, int *size, char fullpath[], int simblink)
 {
-    int filesize = 0, childsize = 0;
-    int numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
     if (strcmp(dentry->d_name, ".") != 0 && strcmp(dentry->d_name, "..") != 0)
     {
+        int filesize; 
         if (args->bytes)
-        {
             filesize = (int)stat_entry.st_size;
-        }
         else
-        {
-            filesize = numBlocks;
-        }
-
+            filesize = to4096Blocks((int)stat_entry.st_size);
+        int childsize = 0;
         if (args->maxDepth > 1)
         {
             childsize = forkAux(args, dentry->d_name, 1);
         }
-
         filesize += childsize;
+
         if (!args->noSubDir)
         {
             *size += filesize;
         }
-
+        if(!args->bytes)
+            filesize = blocksToBlocks(filesize, args->blockSize);
         print(args, filesize, fullpath, simblink);
-        regEntry(numBlocks, fullpath);
-    }     
-
+        regEntry(filesize, fullpath);
+    }
 }

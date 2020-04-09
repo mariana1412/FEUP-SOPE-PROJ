@@ -1,71 +1,33 @@
-0.05 - 00008732 - CREATE - ./simpledu -l . -a
-0.09 - 00008732 - ENTRY - 12 ./display.o
-0.11 - 00008732 - ENTRY - 4 ./args.h
-0.12 - 00008732 - ENTRY - 8 ./args.o
-0.13 - 00008732 - ENTRY - 4 ./reg.txt
-0.14 - 00008732 - ENTRY - 28 ./simpledu
-0.14 - 00008732 - ENTRY - 8 ./args.c
-0.15 - 00008732 - ENTRY - 4 ./simpledu.h
-0.16 - 00008732 - ENTRY - 4 ./reg.c
-0.05 - 00008734 - CREATE - simpledu -l ./AnotherOne/Hello/ -a
-0.08 - 00008734 - ENTRY - 4 ./AnotherOne/Hello/tenta
-0.10 - 00008734 - SEND_PIPE - 4
-0.10 - 00008734 - EXIT - 0
-0.05 - 00008733 - CREATE - simpledu -l ./AnotherOne/ -a
-0.14 - 00008733 - RECV_PIPE - 4
-0.17 - 00008733 - ENTRY - 4 ./AnotherOne/Hello
-0.19 - 00008733 - ENTRY - 4 ./AnotherOne/funcionacrlh
-0.20 - 00008733 - SEND_PIPE - 12
-0.20 - 00008733 - EXIT - 0
-0.17 - 00008732 - ENTRY - 4 ./signals.c
-0.23 - 00008732 - RECV_PIPE - 12
-0.26 - 00008732 - ENTRY - 4 ./AnotherOne
-0.29 - 00008732 - ENTRY - 4 ./signals.o
-0.31 - 00008732 - ENTRY - 4 ./signals.h
-0.33 - 00008732 - ENTRY - 4 ./macros.h
-0.05 - 00008737 - CREATE - simpledu -l ./Test/D1/Da/ -a
-0.13 - 00008737 - ENTRY - 4 ./Test/D1/Da/tounafesta.txt
-0.23 - 00008737 - SEND_PIPE - 4
-0.23 - 00008737 - EXIT - 0
-0.05 - 00008736 - CREATE - simpledu -l ./Test/D1/ -a
-0.20 - 00008736 - RECV_PIPE - 4
-0.06 - 00008739 - CREATE - simpledu -l ./Test/D1/Db/Dx/ -a
-0.12 - 00008739 - ENTRY - 4 ./Test/D1/Db/Dx/toufarta
-0.16 - 00008739 - ENTRY - 4 ./Test/D1/Db/Dx/herewego
-0.17 - 00008739 - SEND_PIPE - 8
-0.17 - 00008739 - EXIT - 0
-0.06 - 00008738 - CREATE - simpledu -l ./Test/D1/Db/ -a
-0.18 - 00008738 - RECV_PIPE - 8
-0.22 - 00008738 - ENTRY - 4 ./Test/D1/Db/Dx
-0.23 - 00008738 - SEND_PIPE - 12
-0.24 - 00008738 - EXIT - 0
-0.29 - 00008736 - ENTRY - 4 ./Test/D1/Da
-0.45 - 00008736 - RECV_PIPE - 12
-0.48 - 00008736 - ENTRY - 4 ./Test/D1/Db
-0.50 - 00008736 - SEND_PIPE - 24
-0.50 - 00008736 - EXIT - 0
-0.05 - 00008735 - CREATE - simpledu -l ./Test/ -a
-0.14 - 00008735 - RECV_PIPE - 24
-0.17 - 00008735 - ENTRY - 4 ./Test/D1
-0.05 - 00008740 - CREATE - simpledu -l ./Test/D2/ -a
-0.09 - 00008740 - ENTRY - 4 ./Test/D2/try
-0.11 - 00008740 - SEND_PIPE - 4
-0.11 - 00008740 - EXIT - 0
-0.20 - 00008735 - ENTRY - 4 ./Test/happilydepressed.txt
-0.27 - 00008735 - RECV_PIPE - 4
-0.29 - 00008735 - ENTRY - 4 ./Test/D2
-0.30 - 00008735 - SEND_PIPE - 40
-0.31 - 00008735 - EXIT - 0
-0.34 - 00008732 - ENTRY - 4 ./reg.h
-0.40 - 00008732 - RECV_PIPE - 40
-0.43 - 00008732 - ENTRY - 4 ./Test
-0.44 - 00008732 - ENTRY - 4 ./Makefile
-0.46 - 00008732 - ENTRY - 4 ./simpledu.c
-0.47 - 00008732 - ENTRY - 4 ./display.h
-0.48 - 00008732 - ENTRY - 236 ./PrimeiroProjeto.pdf
-0.49 - 00008732 - ENTRY - 4 ./simpledu.o
-0.50 - 00008732 - ENTRY - 8 ./display.c
-0.51 - 00008732 - ENTRY - 8 ./reg.o
-0.52 - 00008732 - ENTRY - 4 ./ 
-0.53 - 00008732 - SEND_PIPE - 428
-0.54 - 00008732 - EXIT - 0
+0.06 - 00015598 - CREATE - simpledu -l Test/D1/Da/ -a -b -B 1000 -S
+0.10 - 00015598 - ENTRY - 5 Test/D1/Da/tounafesta.txt
+0.13 - 00015598 - SEND_PIPE - 2465
+0.14 - 00015598 - EXIT - 0
+0.06 - 00015597 - CREATE - simpledu -l Test/D1/ -a -b -B 1000 -S
+0.18 - 00015597 - RECV_PIPE - 2465
+0.06 - 00015600 - CREATE - simpledu -l Test/D1/Db/Dx/ -a -b -B 1000 -S
+0.10 - 00015600 - ENTRY - 5 Test/D1/Db/Dx/toufarta
+0.15 - 00015600 - ENTRY - 5 Test/D1/Db/Dx/herewego
+0.16 - 00015600 - SEND_PIPE - 963
+0.17 - 00015600 - EXIT - 0
+0.06 - 00015599 - CREATE - simpledu -l Test/D1/Db/ -a -b -B 1000 -S
+0.15 - 00015599 - RECV_PIPE - 963
+0.19 - 00015599 - ENTRY - 5 Test/D1/Db/Dx
+0.20 - 00015599 - SEND_PIPE - 0
+0.20 - 00015599 - EXIT - 0
+0.22 - 00015597 - ENTRY - 5 Test/D1/Da
+0.30 - 00015597 - RECV_PIPE - 0
+0.33 - 00015597 - ENTRY - 5 Test/D1/Db
+0.35 - 00015597 - SEND_PIPE - 0
+0.44 - 00015597 - EXIT - 0
+0.06 - 00015596 - CREATE - ./simpledu -l Test -a -B 1000 -S -b
+0.16 - 00015596 - RECV_PIPE - 0
+0.20 - 00015596 - ENTRY - 5 Test/D1
+0.06 - 00015601 - CREATE - simpledu -l Test/D2/ -a -b -B 1000 -S
+1.32 - 00015601 - ENTRY - 5 Test/D2/try
+1.35 - 00015601 - SEND_PIPE - 38
+1.36 - 00015601 - EXIT - 0
+0.22 - 00015596 - ENTRY - 5 Test/happilydepressed.txt
+1.40 - 00015596 - RECV_PIPE - 38
+1.45 - 00015596 - ENTRY - 5 Test/D2
+1.48 - 00015596 - ENTRY - 9 Test
+1.48 - 00015596 - EXIT - 0
