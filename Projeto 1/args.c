@@ -214,16 +214,14 @@ void getArgv(char* dirpath, struct ArgumentFlags *args, char*res[]){
     }
     if(args->maxDepth != INT_MAX){
         char aux[10];
-
         int newdepth = args->maxDepth - 1;
         sprintf(aux, "%d", newdepth);
         char aux2[] = "--max-depth=";
         strcat(aux2, aux);
-        strcpy(res[i], aux2);
+        res[i] = aux2;
         i++;
     }
-   
-
+    
     for(int j = i; j < 12; j++){
         res[j] = NULL;
     }

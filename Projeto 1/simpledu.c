@@ -25,7 +25,7 @@ int main(int argc, char *argv[], char *envp[]){
 
     initExecReg();
     
-    sleep(10);
+    //sleep(10);
 
     if (argc == 1 || argc > 10) {   
         printf("Usage: %s -l [path] [-a] [-b] [-B size] [-L] [-S] [--max-depth=N]\n", argv[0]); 

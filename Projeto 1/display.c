@@ -1,6 +1,7 @@
 #include "display.h"
 pid_t main_prg;
 pid_t child;
+
 int bytesToBlocks(int blocks, int blocksize) {
     return blocks * 512 / blocksize;
 }
@@ -43,10 +44,12 @@ int forkAux(struct ArgumentFlags * args, char * path, int n){
 
         char* arguments[12];
         char newpath[100];
-        if(n ==1)
+        if(n == 1){
             buildPath(path, args,newpath);
+        }
         else 
             strcpy(newpath,path);
+
         getArgv(newpath, args, arguments);
         execv("./simpledu", arguments);
         printf("Exec failed!\n");
@@ -72,7 +75,6 @@ int forkAux(struct ArgumentFlags * args, char * path, int n){
 }
 
 void display(struct ArgumentFlags *args) {
-    
     DIR *dir; 
     char *path = args->path;
     ssize_t len;
@@ -83,18 +85,26 @@ void display(struct ArgumentFlags *args) {
     char line[10];
     int n;
 
-    struct stat stat_entry;
-    if(lstat(path, &stat_entry) < 0)  //invalid path
-        return ;
     
-    int numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
-    if(args->bytes) {
-        size = (int)stat_entry.st_size;
-    }                
-    else {
-        size = numBlocks;
-    }
+    char* parentpid = getenv("MAIN_PID");
+    char pid[10];
+    sprintf(pid, "%d", getpid());
 
+    struct stat stat_entry;
+    int numBlocks;
+
+    if(strcmp(pid, parentpid) == 0) {
+        if(lstat(path, &stat_entry) < 0)  //invalid path
+            return ;
+            
+        numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
+        if(args->bytes) {
+            size = (int)stat_entry.st_size; 
+        }                
+        else {
+            size = numBlocks;
+        }
+    }  
     if ((dir = opendir(path)) == NULL) {
         perror(path); 
         exit(2);
@@ -114,10 +124,9 @@ void display(struct ArgumentFlags *args) {
         stat_entry = getStat(); 
         
         numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
-        int filesize, childsize;
+        int filesize = 0, childsize = 0;
         switch(type){
             case 0:
-                
                 if(args->bytes) {
                     filesize = (int)stat_entry.st_size;
                 }
@@ -138,27 +147,34 @@ void display(struct ArgumentFlags *args) {
                         filesize = numBlocks;
                     }
 
-                    if(args->maxDepth > 0) {
+                    if(args->maxDepth > 1) {
                         childsize=forkAux(args, dentry->d_name,1);
+                        
                     } 
+                    
+                    filesize += childsize;
                     if(!args->noSubDir) {
-                        filesize += childsize;
                         size+=filesize;
                     }
+                                       
+
                     print(args, filesize, fullpath,1);
                     regEntry(numBlocks, fullpath);
                 }  
+                
 
                 break;
             case 2:
-                if(args->simbolicLinks) { /*seguir no link*/
+                if(args->simbolicLinks) { 
                     while(1){
                         if((len=readlink(fullpath,buf,sizeof(buf)-1))!=-1){//building the path to the simbolic link
+                            
                             buf[len]='\0'; 
                             strcat(filename,buf);
                             int aux= verifyPath(filename);
                             stat_entry = getStat();
                             numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
+                            
                             if(aux ==1){//if it is a directory 
                                 strcat(filename,"/");
                                 if(args->bytes) {
@@ -167,15 +183,17 @@ void display(struct ArgumentFlags *args) {
                                 else {
                                     filesize = numBlocks;
                                 }
-                            
-                                if(args->maxDepth > 0) {
+
+                                if(args->maxDepth > 1) {
                                     childsize=forkAux(args, dentry->d_name,1);
                                 } 
+
+                                filesize += childsize;
+                                
                                 if(!args->noSubDir) {
-                                    filesize += childsize;
                                     size+=filesize; 
                                 }
-                                              
+                                             
                                 print(args, filesize, fullpath,2);
                                 free(filename);
                                 regEntry(numBlocks, fullpath);
@@ -202,7 +220,6 @@ void display(struct ArgumentFlags *args) {
                                 break;
                             }
                             //dont know if we need to check if it is another link--we do 
-                            //falta fazer a soma do symblink
                         }
                     }
                 }
@@ -212,11 +229,9 @@ void display(struct ArgumentFlags *args) {
                 break;
         }                  
     }
+    
     sprintf(line, "%d", size);
     n = strlen(line);
-    char* parentpid = getenv("MAIN_PID");
-    char pid[10];
-    sprintf(pid, "%d", getpid());
     if(strcmp(pid, parentpid)) {
         write(STDIN_FILENO, line, n);
     } 
