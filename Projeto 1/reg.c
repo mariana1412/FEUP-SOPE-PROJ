@@ -41,6 +41,7 @@ void regCreate(int argc, char *argv[]){
     }
     strcat(info, argv[argc-1]);        
     fprintf(regFile, "%.2f - %.8d - CREATE - %s\n", reg.instant, reg.pid, info);
+    fflush(regFile);
 }
 
 void regExit(int exitStatus){
@@ -49,8 +50,8 @@ void regExit(int exitStatus){
     struct Reg reg;
 
     fillReg(&reg);
-    fflush(regFile);
     fprintf(regFile, "%.2f - %.8d - EXIT - %d\n", reg.instant, reg.pid, exitStatus);
+    fflush(regFile);
     fclose(regFile);
 }
 
@@ -61,8 +62,8 @@ void regRecvSignal(int signal){
     struct Reg reg;
 
     fillReg(&reg);
-    fflush(regFile);
     fprintf(regFile, "%.2f - %.8d - RECV_SIGNAL - %d\n", reg.instant, reg.pid,signal);
+    fflush(regFile);
 }
 
 void regSendSignal(int signal, pid_t pid){
@@ -70,8 +71,8 @@ void regSendSignal(int signal, pid_t pid){
         return;
     struct Reg reg;
     fillReg(&reg);
-    fflush(regFile);
     fprintf(regFile, "%.2f - %.8d - SEND_SIGNAL - Signal %d to % d\n", reg.instant, reg.pid,signal, pid);
+    fflush(regFile);
 }
 
 void regRecvPipe(char* message){
@@ -79,8 +80,8 @@ void regRecvPipe(char* message){
         return;
     struct Reg reg;
     fillReg(&reg);
-    fflush(regFile);
     fprintf(regFile, "%.2f - %.8d - RECV_PIPE - %s\n", reg.instant, reg.pid, message);
+    fflush(regFile);
 }
 
 void regSendPipe(char* message){
@@ -89,8 +90,8 @@ void regSendPipe(char* message){
     struct Reg reg;
 
     fillReg(&reg);
-    fflush(regFile);
     fprintf(regFile, "%.2f - %.8d - SEND_PIPE - %s\n", reg.instant, reg.pid, message);
+    fflush(regFile);
 }
 
 void regEntry(int blocks, char* path){
@@ -102,7 +103,7 @@ void regEntry(int blocks, char* path){
     strcat(info, " ");
     strcat(info, path);
     fillReg(&reg);
-    fflush(regFile);
     fprintf(regFile, "%.2f - %.8d - ENTRY - %s\n", reg.instant, reg.pid, info);
+    fflush(regFile);
 }
 
