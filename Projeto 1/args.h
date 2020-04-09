@@ -23,41 +23,12 @@ struct ArgumentFlags{
     int maxDepth; // --max-depth=N, limits the displayed info to N (0,1,..) levels of directories depth
     char *path;// path of 
 };
-
-/**
-* @brief Functions that attributes an integer number to the argument type
-* @param arg - argument 
-* @return Returns 0 if OK, -1 otherwise
-*/
-
 int idArguments(char *arg);
-/**
-* @brief Functions that parses the arguments given on the command line and fills the struct of argument flags
-* @param argc - number of arguments
-* @param argv - arguments
-* @param args - function to be filled with the info given by the user
-* @return 0 if OK, -1 otherwise
-*/
 int parseArguments(int argc, char *argv[], struct ArgumentFlags *args);
-/**
-* @brief Function that verifies if the path is valid and if it is a file or a directory
-* @param path - path given by the user
-* @return 0 if OK, -1 otherwise
-*/
 int verifyPath(char * path);
-/**
-* @brief Function that initializes the argument flags struct
-* @param args - struct to be initialized
-*/
 void initArgumentFlags(struct ArgumentFlags *args);
-/**
-* @brief Function that prints the flags
-* @param args - arguments
-*/
 void checkFlags(struct ArgumentFlags* args);
-
 struct stat getStat();
-
 void getArgv(char* dirpath, struct ArgumentFlags *args, char*res[]);
 
 #endif /*ARGS_H*/

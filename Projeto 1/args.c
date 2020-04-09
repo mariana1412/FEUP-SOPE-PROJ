@@ -3,17 +3,16 @@
 static struct stat pathStat;
 
 int isNumber(char *n) {
-    int size = sizeof(n)/sizeof(char);
+    int size = sizeof(n)/sizeof(char*);
     for(int i = 0; i<size; i++){
-        printf("%d  ", n[i]);
-        if(!isdigit(n[i])) return 0;
+        if(!(n[i]>47 && n[i]<58))
+            return 0;         
     }
     return 1;
 }
 
-
 int idArguments(char *arg){
-    
+
     char *arguments[11] = {"-a", "--all", "-b", "--bytes", "-B", "--block-size=", "-L", "--dereference", "-S", "--separate-dirs", "--max-depth="};
  
     //nota: strcmp() retorn 0 quando são iguais
@@ -79,22 +78,8 @@ void initArgumentFlags(struct ArgumentFlags *args){
     args->maxDepth = INT_MAX;
     args->path = ".";
 }
-        //fazer por omissão -> "simpledu -l"
-        /*
-        1.apresenta o espaço ocupado em número de blocos de 1024 bytes;
-        2.apenas lista diretórios;
-        3.não segue links simbólicos,
-        4.contabiliza uma única vez cada ficheiro;
-        5.apresenta de forma cumulativa o tamanho de subdiretórios e ficheiros incluídos;
-        6.não restringe os níveis de profundidade na estrutura de diretórios.
-        */
-int parseArguments(int argc, char *argv[], struct ArgumentFlags *args){ //tem sempre o l
-    
-    //verificar se path é valido ('.' é pasta atual)
-    //no caso de idArguments retornar o valor de "-B", obrigatoriamente o argv[seguinte] é um número 
-    //ver que o valor tem que ser numero e nao um carater qq 
-    //no caso de "qualquercoisa= ", é preciso verificar se tem inteiro a seguir
-    
+
+int parseArguments(int argc, char *argv[], struct ArgumentFlags *args){
     for(int i = 2; i < argc; i++){
         int id = idArguments(argv[i]); 
         switch(id){
@@ -114,26 +99,26 @@ int parseArguments(int argc, char *argv[], struct ArgumentFlags *args){ //tem se
                     else
                         return -1;
                     
-                    args->blockSize = atoi(argv[i]);
+                    
 
-                    /*if(isNumber(argv[i])){
-                        
+                    if(isNumber(argv[i])){
+                        args->blockSize = atoi(argv[i]);
                     }
                     else{
                         return -1;
-                    }*/
+                    }
  
                 }
                 else {
                     char *num = strstr(argv[i], "=");
-                     args->blockSize = atoi(num+1);
+                     
 
-                    /*if(isNumber(num+1)){
-                       
+                    if(isNumber(num+1)){
+                       args->blockSize = atoi(num+1);
                     }
                     else{
                         return -1;
-                    }*/
+                    }
 
                 }
                 break;
@@ -148,13 +133,13 @@ int parseArguments(int argc, char *argv[], struct ArgumentFlags *args){ //tem se
 
             case MAX_DEPTH: {
                 char *num = strstr(argv[i], "=");
-                args->maxDepth = atoi(num+1);
-                /*if(isNumber(num+1)){
-                    
+                
+                if(isNumber(num+1)){
+                    args->maxDepth = atoi(num+1);
                 }
                 else{
                     return -1;
-                }*/
+                }
 
                 break;
             }
@@ -220,10 +205,8 @@ void getArgv(char* dirpath, struct ArgumentFlags *args, char*res[]){
         strcat(aux2, aux);
         res[i] = aux2;
         i++;
-    }
-    
+    } 
     for(int j = i; j < 12; j++){
         res[j] = NULL;
-    }
-    
+    }  
 }

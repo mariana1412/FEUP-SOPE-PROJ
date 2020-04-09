@@ -15,7 +15,7 @@ void buildPath(char * dirname, struct ArgumentFlags * args, char * aux) {
     if(aux[strlen(aux)-1] != '/'){
         strcat(aux, "/");
     }
-}
+}   
 void print(struct ArgumentFlags * args, int size, char* name,int type){
     if(type==0){
         if(!args->all){
@@ -24,6 +24,55 @@ void print(struct ArgumentFlags * args, int size, char* name,int type){
     }
     printf("%-4d \t %s\n", size, name);
 }
+void printFile(struct ArgumentFlags *args, struct stat stat_entry, int *size, char fullpath[], int simblink)
+{
+    int filesize;
+    int numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
+    if (args->bytes)
+    {
+        filesize = (int)stat_entry.st_size;
+    }
+    else
+    {
+        filesize = numBlocks;
+    }
+    *size += filesize;
+    print(args, filesize, fullpath, simblink);
+    regEntry(numBlocks, fullpath);
+}
+
+void printDir(struct ArgumentFlags *args, struct stat stat_entry, struct dirent *dentry, int *size, char fullpath[], int simblink)
+{
+    int filesize = 0, childsize = 0;
+    int numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
+    if (strcmp(dentry->d_name, ".") != 0 && strcmp(dentry->d_name, "..") != 0)
+    {
+        if (args->bytes)
+        {
+            filesize = (int)stat_entry.st_size;
+        }
+        else
+        {
+            filesize = numBlocks;
+        }
+
+        if (args->maxDepth > 1)
+        {
+            childsize = forkAux(args, dentry->d_name, 1);
+        }
+
+        filesize += childsize;
+        if (!args->noSubDir)
+        {
+            *size += filesize;
+        }
+
+        print(args, filesize, fullpath, simblink);
+        regEntry(numBlocks, fullpath);
+    }     
+
+}
+
 int forkAux(struct ArgumentFlags * args, char * path, int n){
     int childsize = 0;
     pid_t pid;
@@ -39,6 +88,10 @@ int forkAux(struct ArgumentFlags * args, char * path, int n){
         if (getpgrp() == main_prg) {
             setpgid(pid, getpid());
         }
+
+        signal(SIGTERM, sigterm_handler);
+        signal(SIGCONT, sigcont_handler);
+
         close(fd[READ]);
         dup2(fd[WRITE], STDIN_FILENO);
 
@@ -56,15 +109,20 @@ int forkAux(struct ArgumentFlags * args, char * path, int n){
     }
 
     else if(pid > 0) {
-        if (getpgrp() == main_prg) { child = pid; }
-        if(wait(NULL) != pid) {
+        if (getpgrp() == main_prg)
+            child = pid; 
+        
+        if(wait(NULL) != pid)
             fprintf(stderr, "wait error\n");
-        }
+        
         char* auxPath = args->path;
+
         close(fd[WRITE]);
+
         char line[10];
         int n = read(fd[READ], line, 10);
         line[n] ='\0';
+
         regRecvPipe(line);
         sscanf(line, "%d", &childsize);
 
@@ -107,6 +165,7 @@ void display(struct ArgumentFlags *args) {
     }  
     if ((dir = opendir(path)) == NULL) {
         perror(path); 
+        regExit(2);
         exit(2);
     }  
 
@@ -124,45 +183,14 @@ void display(struct ArgumentFlags *args) {
         stat_entry = getStat(); 
         
         numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
-        int filesize = 0, childsize = 0;
+        int filesize = 0;
         switch(type){
             case 0:
-                if(args->bytes) {
-                    filesize = (int)stat_entry.st_size;
-                }
-                else {
-                    filesize = numBlocks;
-                }
-                size += filesize;
-                print(args, filesize, fullpath,0);
-                regEntry(numBlocks, fullpath);
+                printFile(args, stat_entry, &size, fullpath, 0);
                 break;
 
             case 1:
-                if(strcmp(dentry->d_name, ".")!=0 && strcmp(dentry->d_name, "..")!=0) {
-                    if(args->bytes) {
-                        filesize = (int)stat_entry.st_size;
-                    }
-                    else {
-                        filesize = numBlocks;
-                    }
-
-                    if(args->maxDepth > 1) {
-                        childsize=forkAux(args, dentry->d_name,1);
-                        
-                    } 
-                    
-                    filesize += childsize;
-                    if(!args->noSubDir) {
-                        size+=filesize;
-                    }
-                                       
-
-                    print(args, filesize, fullpath,1);
-                    regEntry(numBlocks, fullpath);
-                }  
-                
-
+                printDir(args, stat_entry, dentry, &size, fullpath, 1);
                 break;
             case 2:
                 if(args->simbolicLinks) { 
@@ -176,55 +204,42 @@ void display(struct ArgumentFlags *args) {
                             numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
                             
                             if(aux ==1){//if it is a directory 
-                                strcat(filename,"/");
-                                if(args->bytes) {
-                                    filesize = (int)stat_entry.st_size;
-                                }
-                                else {
-                                    filesize = numBlocks;
-                                }
-
-                                if(args->maxDepth > 1) {
-                                    childsize=forkAux(args, dentry->d_name,1);
-                                } 
-
-                                filesize += childsize;
-                                
-                                if(!args->noSubDir) {
-                                    size+=filesize; 
-                                }
-                                             
-                                print(args, filesize, fullpath,2);
+                                printDir(args, stat_entry, dentry, &size, fullpath, 2);
                                 free(filename);
-                                regEntry(numBlocks, fullpath);
                                 break;
                             }
                             else if(aux ==0){ //if it is a file
-                                
-                                if(args->bytes) {
-                                    filesize = (int)stat_entry.st_size;
-                                }
-                                else {
-                                    filesize = numBlocks;
-                                }
-                                size += filesize;
-                                print(args,size, fullpath,2);
-                                regEntry(numBlocks, fullpath);
+                                printFile(args, stat_entry, &size, fullpath, 2);
                                 free(filename);
                                 break;
                             }
                             else if(aux == 2) {
+                                numBlocks = bytesToBlocks(filesize, args->blockSize);
+                                print(args, filesize, fullpath,2); 
+                                regEntry(numBlocks, fullpath);
                                 continue;
                             }
                             else {
                                 break;
                             }
-                            //dont know if we need to check if it is another link--we do 
                         }
                     }
                 }
                 else{
-                    print(args, size, fullpath,2);    
+                    if(args->all){
+                        stat_entry = getStat();
+                        numBlocks = bytesToBlocks((int)stat_entry.st_blocks, args->blockSize);
+                        if(args->bytes) {
+                            filesize = (int)stat_entry.st_size;
+                        }
+                        else {
+                            filesize = numBlocks;
+                        }
+                        size += filesize;
+                        print(args,filesize, fullpath,2); 
+                        regEntry(numBlocks, fullpath); 
+                    }
+                      
                 }
                 break;
         }                  
