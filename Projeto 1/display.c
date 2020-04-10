@@ -43,6 +43,48 @@ void print(struct ArgumentFlags *args, int size, char *name, int type)
     }
     printf("%-4d \t %s\n", size, name);
 }
+
+void printFile(struct ArgumentFlags *args, struct stat stat_entry, int *size, char fullpath[], int simblink)
+{
+    int filesize; 
+    if (args->bytes)
+        filesize = (int)stat_entry.st_size;
+    else
+        filesize = to4096Blocks((int)stat_entry.st_size);
+    *size += filesize;
+    if(!args->bytes)
+        filesize = blocksToBlocks(filesize, args->blockSize);
+    print(args, filesize, fullpath, simblink);
+    regEntry(filesize, fullpath);
+}
+
+void printDir(struct ArgumentFlags *args, struct stat stat_entry, struct dirent *dentry, int *size, char fullpath[], int simblink)
+{
+    if (strcmp(dentry->d_name, ".") != 0 && strcmp(dentry->d_name, "..") != 0)
+    {
+        int filesize; 
+        if (args->bytes)
+            filesize = (int)stat_entry.st_size;
+        else
+            filesize = to4096Blocks((int)stat_entry.st_size);
+        int childsize = 0;
+        if (args->maxDepth > 1)
+        {
+            childsize = forkAux(args, dentry->d_name, 1);
+        }
+        filesize += childsize;
+
+        if (!args->noSubDir)
+        {
+            *size += filesize;
+        }
+        if(!args->bytes)
+            filesize = blocksToBlocks(filesize, args->blockSize);
+        print(args, filesize, fullpath, simblink);
+        regEntry(filesize, fullpath);
+    }
+}
+
 int forkAux(struct ArgumentFlags *args, char *path, int n)
 {
     int childsize = 0;
@@ -60,6 +102,10 @@ int forkAux(struct ArgumentFlags *args, char *path, int n)
         {
             setpgid(pid, getpid());
         }
+
+        signal(SIGTERM, sigterm_handler);
+        signal(SIGCONT, sigcont_handler);
+
         close(fd[READ]);
         dup2(fd[WRITE], STDIN_FILENO);
 
@@ -89,6 +135,7 @@ int forkAux(struct ArgumentFlags *args, char *path, int n)
         }
         char *auxPath = args->path;
         close(fd[WRITE]);
+
         char line[10];
         int n = read(fd[READ], line, 10);
         line[n] = '\0';
@@ -132,6 +179,7 @@ void display(struct ArgumentFlags *args)
     if ((dir = opendir(path)) == NULL)
     {
         perror(path);
+        regExit(2);
         exit(2);
     }
 
@@ -248,43 +296,4 @@ void display(struct ArgumentFlags *args)
     }
 }
 
-void printFile(struct ArgumentFlags *args, struct stat stat_entry, int *size, char fullpath[], int simblink)
-{
-    int filesize; 
-    if (args->bytes)
-        filesize = (int)stat_entry.st_size;
-    else
-        filesize = to4096Blocks((int)stat_entry.st_size);
-    *size += filesize;
-    if(!args->bytes)
-        filesize = blocksToBlocks(filesize, args->blockSize);
-    print(args, filesize, fullpath, simblink);
-    regEntry(filesize, fullpath);
-}
 
-void printDir(struct ArgumentFlags *args, struct stat stat_entry, struct dirent *dentry, int *size, char fullpath[], int simblink)
-{
-    if (strcmp(dentry->d_name, ".") != 0 && strcmp(dentry->d_name, "..") != 0)
-    {
-        int filesize; 
-        if (args->bytes)
-            filesize = (int)stat_entry.st_size;
-        else
-            filesize = to4096Blocks((int)stat_entry.st_size);
-        int childsize = 0;
-        if (args->maxDepth > 1)
-        {
-            childsize = forkAux(args, dentry->d_name, 1);
-        }
-        filesize += childsize;
-
-        if (!args->noSubDir)
-        {
-            *size += filesize;
-        }
-        if(!args->bytes)
-            filesize = blocksToBlocks(filesize, args->blockSize);
-        print(args, filesize, fullpath, simblink);
-        regEntry(filesize, fullpath);
-    }
-}

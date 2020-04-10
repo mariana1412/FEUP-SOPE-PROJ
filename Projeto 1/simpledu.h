@@ -11,12 +11,4 @@
 #include "display.h"
 #include "signals.h"
 
-
-/** @defgroup Simpledu
- * @{
- *
- * Main functions  
- */
-
-
 #endif /*SIMPLEDU_H*/
