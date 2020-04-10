@@ -18,8 +18,8 @@
 #include "macros.h"
 #include "reg.h"
 
-int bytesToBlocks(int blocks, int blocksize);
-int toBlocks(int bytes, int blocksize);
+int bytesToBlocks(int blocks, int blocksize, int def);
+int toBlocks(int bytes, int blocksize, int def);
 void buildPath(char * dirname, struct ArgumentFlags * args, char * aux);
 int forkAux(struct ArgumentFlags * args, char * path,int n);
 void print(struct ArgumentFlags *args, int size, char* name, int type);

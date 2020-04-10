@@ -2,17 +2,17 @@
 pid_t main_prg;
 pid_t child;
 
-int to4096Blocks(int bytes)
+int to4096Blocks(int bytes, int def)
 {
-    if(bytes%4096)
-        return bytes/4096 + 1;
+    if(bytes%def)
+        return bytes/def + 1;
     else
-        return bytes/4096;
+        return bytes/def;
     
 }
 
-int blocksToBlocks(int blocks, int blocksize) {
-    int n = blocks*4096;
+int blocksToBlocks(int blocks, int blocksize, int def) {
+    int n = blocks*def;
     if(n%blocksize)
         return n/blocksize +1;
     else
@@ -41,7 +41,7 @@ void print(struct ArgumentFlags *args, int size, char *name, int type)
             return;
         }
     }
-    printf("%-4d \t %s\n", size, name);
+    printf("%-d\t%s\n", size, name);
 }
 
 void printFile(struct ArgumentFlags *args, struct stat stat_entry, int *size, char fullpath[], int simblink)
@@ -50,10 +50,10 @@ void printFile(struct ArgumentFlags *args, struct stat stat_entry, int *size, ch
     if (args->bytes)
         filesize = (int)stat_entry.st_size;
     else
-        filesize = to4096Blocks((int)stat_entry.st_size);
+        filesize = to4096Blocks((int)stat_entry.st_size,(int)stat_entry.st_blksize);
     *size += filesize;
     if(!args->bytes)
-        filesize = blocksToBlocks(filesize, args->blockSize);
+        filesize = blocksToBlocks(filesize, args->blockSize,(int)stat_entry.st_blksize);
     print(args, filesize, fullpath, simblink);
     regEntry(filesize, fullpath);
 }
@@ -66,7 +66,7 @@ void printDir(struct ArgumentFlags *args, struct stat stat_entry, struct dirent 
         if (args->bytes)
             filesize = (int)stat_entry.st_size;
         else
-            filesize = to4096Blocks((int)stat_entry.st_size);
+            filesize = to4096Blocks((int)stat_entry.st_size,(int)stat_entry.st_blksize);
         int childsize = 0;
         if (args->maxDepth > 1)
         {
@@ -79,7 +79,7 @@ void printDir(struct ArgumentFlags *args, struct stat stat_entry, struct dirent 
             *size += filesize;
         }
         if(!args->bytes)
-            filesize = blocksToBlocks(filesize, args->blockSize);
+            filesize = blocksToBlocks(filesize, args->blockSize,(int)stat_entry.st_blksize);
         print(args, filesize, fullpath, simblink);
         regEntry(filesize, fullpath);
     }
@@ -174,7 +174,7 @@ void display(struct ArgumentFlags *args)
         if (args->bytes)
             size = (int)stat_entry.st_size;
         else
-            size = to4096Blocks((int)stat_entry.st_size);
+            size = to4096Blocks((int)stat_entry.st_size, (int)stat_entry.st_blksize);
     }
     if ((dir = opendir(path)) == NULL)
     {
@@ -242,9 +242,9 @@ void display(struct ArgumentFlags *args)
                                 regEntry(size, fullpath);
                             }
                             else {
-                                numBlocks = to4096Blocks(size);
-                                print(args, blocksToBlocks(numBlocks, args->blockSize), fullpath, 2);
-                                regEntry(blocksToBlocks(numBlocks, args->blockSize), fullpath);
+                                numBlocks = to4096Blocks(size,(int)stat_entry.st_blksize);
+                                print(args, blocksToBlocks(numBlocks, args->blockSize,(int)stat_entry.st_blksize), fullpath, 2);
+                                regEntry(blocksToBlocks(numBlocks, args->blockSize,(int)stat_entry.st_blksize), fullpath);
                             }
                             continue;
                         }
@@ -261,15 +261,18 @@ void display(struct ArgumentFlags *args)
             {
                 if (args->all)
                 {
+                    stat_entry = getStat();
+                    filesize = (int)stat_entry.st_size;
                     if (args->bytes) {
-                        print(args, filesize, fullpath, 2);
-                        regEntry(filesize, fullpath);
+                        size+=filesize;
                     }
                     else {
-                        numBlocks = to4096Blocks(filesize);
-                        print(args, blocksToBlocks(numBlocks, args->blockSize), fullpath, 2);
-                        regEntry(blocksToBlocks(numBlocks, args->blockSize), fullpath);
+                        numBlocks = to4096Blocks(filesize,(int)stat_entry.st_blksize);
+                        size+=numBlocks;
+                        filesize =  blocksToBlocks(numBlocks, args->blockSize,(int)stat_entry.st_blksize);
                     }
+                    print(args, filesize, fullpath, 2);
+                    regEntry(filesize, fullpath);
                 }
             }
             break;
@@ -290,8 +293,8 @@ void display(struct ArgumentFlags *args)
             regEntry(size, path);
         }
         else {
-            print(args, blocksToBlocks(size, args->blockSize), path, 1);
-            regEntry(blocksToBlocks(size, args->blockSize), path);
+            print(args, blocksToBlocks(size, args->blockSize,(int)stat_entry.st_blksize), path, 1);
+            regEntry(blocksToBlocks(size, args->blockSize,(int)stat_entry.st_blksize), path);
         }
     }
 }

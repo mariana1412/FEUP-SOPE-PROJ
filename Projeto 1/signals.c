@@ -1,11 +1,13 @@
 #include "signals.h"
 extern pid_t child;
 
+
 void sigint_handler(int signal) {
     regRecvSignal(SIGINT);
 
     if (child){
         regSendSignal(SIGSTOP, child);
+        sleep(1); 
         kill(-child, SIGSTOP);
     }
 
@@ -32,10 +34,12 @@ void sigint_handler(int signal) {
 }
 
 void sigterm_handler(int signal) {
+    printf("sigterm\n");
     regRecvSignal(SIGTERM);
     regExit(1);
 }
 
 void sigcont_handler(int signal) {
+    printf("sigcont\n");
     regRecvSignal(SIGCONT);
 }
