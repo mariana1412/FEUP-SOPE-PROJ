@@ -263,14 +263,17 @@ void display(struct ArgumentFlags *args)
                 {
                     stat_entry = getStat();
                     filesize = (int)stat_entry.st_size;
+                    
                     if (args->bytes) {
                         size+=filesize;
+                       
                     }
                     else {
-                        numBlocks = to4096Blocks(filesize,(int)stat_entry.st_blksize);
+                        numBlocks = 0;
                         size+=numBlocks;
                         filesize =  blocksToBlocks(numBlocks, args->blockSize,(int)stat_entry.st_blksize);
                     }
+                  
                     print(args, filesize, fullpath, 2);
                     regEntry(filesize, fullpath);
                 }

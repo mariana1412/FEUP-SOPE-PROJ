@@ -7,8 +7,9 @@ void sigint_handler(int signal) {
 
     if (child){
         regSendSignal(SIGSTOP, child);
-        sleep(1); 
-        kill(-child, SIGSTOP);
+        sleep(3); 
+       kill(child, SIGSTOP);
+
     }
 
     printf("In SIGINT handler ...\n");

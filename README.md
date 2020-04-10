@@ -5,8 +5,7 @@
 
 O programa desenvolvido contém todas as features pretendidas no enunciados, todas as funcionar bem à exceção da interrupção pelo utilizador.
 
-A unica feature que não está ok é a de interrupção pelo utilizador--explicar
-
+A unica feature que não está ok é a de interrupção pelo utilizador, apenas funciona se for feito o comando CTRL+C no processo pai principal.No entanto, a mensagem aparece sempre.
 
 ## Detalhes
 Tal como o comando du é permitida a repetição de flags.
