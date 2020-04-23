@@ -17,13 +17,48 @@ completados;
 ● no final, todos os recursos tomados ao sistema devem ser libertados.
 */
 
+void *thr_func(void *fname)
+{
+    int fd2;
+    char * info = (char *) fname;//receives the request in a string
+    int pid = getpid();
+    pthread_t tid = pthread_self();
+    int pl = -1, dur = 3;
+    int i; 
+    char privatefifo[MAX_MSG_LEN];
+  
+    sscanf(info, "[%d,%d,%ld,%d,%d]", &i, &pid, &tid, &dur, &pl);
+
+    sprintf(privatefifo, "/tmp/%d.%ld", pid, tid);
+    //é no private fifo que cria a resposta
+    
+
+    //////NAO ESTÀ NADA REVISTO DENTRO DESTA SECCÃO- ponto 2  de Qn
+    printf("Msg: %s", info);
+    if ((fd2=open(privatefifo,O_WRONLY|O_NONBLOCK)) !=-1)
+        printf("FIFO openned in WRITEONLY mode\n");
+    //MANDAR RESPOSTA
+    char msg[MAX_MSG_LEN];
+    sprintf(msg, "[%d,%d,%ld,%d,%d]", i, pid, tid, dur, pl);
+    write(fd2, msg, MAX_MSG_LEN);
+    
+    ///////
+
+    close(fd2);
+
+    return NULL;
+}
+
+
 int main(int argc, char *argv[])
 {
-    int fd, n, fd_dummy;
+    int fd, n;
     char str[MAX_MSG_LEN];
     struct ArgumentFlags args;
+    int t=0;
+    pthread_t tid[NUM_MAX_THREADS];
 
-    if (argc != 5) {
+    if (argc != 4) {
         printf("Usage: Q1 <-t nsecs> fifoname\n");
         exit(1);
     }
@@ -43,22 +78,27 @@ int main(int argc, char *argv[])
         else 
             printf("Can't create FIFO\n");
     }
-    else 
+    
         printf("FIFO sucessfully created\n");
 
-    if ((fd=open(args.fifoname,O_RDONLY)) !=-1)
+    if ((fd=open(args.fifoname,O_RDONLY|O_NONBLOCK)) !=-1)
         printf("FIFO openned in READONLY mode\n");
 
-    if ((fd_dummy=open(args.fifoname,O_WRONLY)) !=-1)
-        printf("FIFO openned in WRITEONLY mode\n");
-    do
-    {
-        n=read(fd,str,MAX_MSG_LEN);
-        if (n>0) printf("%s has arrived\n",str);
-    } while (strcmp(str,"SHUTDOWN")!=0);
-
+    //LER REQUEST//
+    for(int k = 0; k < 2; k++){
+        if((n=read(fd,str,MAX_MSG_LEN))==-1)
+            printf("Error in read \n");
+        printf("%s has arrived\n",str);
+        pthread_create(&tid[t], NULL, thr_func, str);
+        pthread_join(tid[t],NULL);
+        pthread_exit(NULL);
+        /* após o tempo estipulado para o funcionamento do programa (nsecs), que corresponde ao
+         encerramento doQuarto de Banho, o canal de comunicação fifoname é desativado, mas de 
+         forma a que os pedidos pendentesno "buffer" do canal sejam notificados do facto e 
+         os pedidos em utilização do Quarto de Banho sejamcompletados*/
+    }
+    
     close(fd);
-    close(fd_dummy);
     if (unlink(args.fifoname)<0)
         printf("Error when destroying FIFO\n");
     else

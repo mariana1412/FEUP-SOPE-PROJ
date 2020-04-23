@@ -27,7 +27,7 @@ void initArgumentFlags(struct ArgumentFlags *args){
 }
 
 int parseArguments(int argc, char *argv[], struct ArgumentFlags *args){
-    for(int i = 2; i < argc; i++){
+    for(int i = 1; i < argc; i++){
         int id = idArguments(argv[i]); 
         switch(id){
             case NSECS:
