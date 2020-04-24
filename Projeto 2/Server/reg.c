@@ -48,26 +48,25 @@ void fillReg(struct Reg *reg){
     reg->tid = pthread_self();
 }   
 
-void regOper(int argc, char *argv[], char * oper[]){
+void regOper(char * oper, int i,int dur, int pl){
     struct Reg reg;
-    //struct Info info;
+    struct Info info;
 
     if(regFile == NULL) return;
 
     fillReg(&reg);
 
-   /* info.i = getI();
+    info.i = i; 
     info.pid = reg.pid;
     info.tid = reg.tid;
-    info.dur = getDur();
-    info.pl = getPl();
+    info.dur = dur;
+    info.pl = pl;
 
-    fprintf(regFile, "%2f ; %d ; %8d ; %8d ; %8d ; %d ; %s",reg.instant, info.i, info.pid, info.tid, info.dur, info.pl, oper);
-    fflush(regFile);*/
+    fprintf(regFile, "%2f ; %8d ; %8d ; %ld ; %8d ; %8d ; %s",reg.instant, info.i, info.pid, info.tid, info.dur, info.pl, oper);
+    fflush(regFile);
 }
 
 void closeReg(int exitStatus){
-    //unlink maybe
     fclose(regFile);
 }
 
