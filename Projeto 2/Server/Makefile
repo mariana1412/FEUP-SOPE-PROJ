@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -pthread 
-OBJS = Q1.o  args.o reg.o
-XHDRS = Q1.h reg.h args.h
+OBJS = Q1.o  args.o utils.o
+XHDRS = Q1.h utils.h args.h
 EXEC = Q1
 
 $(EXEC): $(OBJS)

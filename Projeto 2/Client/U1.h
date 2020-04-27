@@ -6,11 +6,10 @@
 #include <pthread.h> 
 #include <sys/time.h>
 #include "../Server/args.c"
-#include "../Server/reg.c"
+#include "../Server/utils.c"
 
-#define MAX_MSG_LEN 500
+#define MAX_MSG_LEN 255
 #define NUM_MAX_THREADS 2
 
-int getI();
 void *thr_func(void *fname);
 int main(int argc, char *argv[]);

@@ -9,7 +9,7 @@
 #include <string.h>
 #include <pthread.h>
 #include "args.h"
-#include "reg.h"
+#include "utils.h"
 
 #define MAX_MSG_LEN 500
 #define NUM_MAX_THREADS 2

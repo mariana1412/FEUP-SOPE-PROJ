@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -pthread 
-OBJS = U1.o
-XHDRS = U1.h args.h reg.h
+OBJS = U1.o	
+XHDRS = U1.h args.h utils.h
 EXEC = U1
 
 $(EXEC): $(OBJS)
