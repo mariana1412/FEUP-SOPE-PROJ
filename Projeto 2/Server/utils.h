@@ -10,7 +10,8 @@
 #include <pthread.h>
 
 void start_time();
-double timePassed();
+void start_time2();
+double timePassed(int server);
 void regOper();
 
 #endif /*REG_H*/

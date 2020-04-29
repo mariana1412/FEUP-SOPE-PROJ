@@ -4,6 +4,7 @@
 #include <sys/file.h>
 #include <string.h>
 #include <pthread.h> 
+#include <errno.h>
 #include <sys/time.h>
 #include "../Server/args.c"
 #include "../Server/utils.c"
