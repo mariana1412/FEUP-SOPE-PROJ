@@ -24,7 +24,5 @@ int idArguments(char *arg);
 int parseArguments(int argc, char *argv[], struct ArgumentFlags *args);
 void initArgumentFlags(struct ArgumentFlags *args);
 void checkFlags(struct ArgumentFlags* args);
-//struct stat getStat();
-void getArgv(char* dirpath, struct ArgumentFlags *args, char*res[]);
 
 #endif /*ARGS_H*/

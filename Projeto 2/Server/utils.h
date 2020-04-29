@@ -1,5 +1,5 @@
-#ifndef REG_H
-#define REG_H
+#ifndef UTILS_H
+#define UTILS_H
 
 #include <stdio.h>      
 #include <stdlib.h>
@@ -10,8 +10,7 @@
 #include <pthread.h>
 
 void start_time();
-void start_time2();
-double timePassed(int server);
+double timePassed();
 void regOper();
 
-#endif /*REG_H*/
+#endif /*UTILS_H*/

@@ -1,3 +1,4 @@
+
 CC = gcc
 CFLAGS = -Wall -pthread 
 OBJS = Q1.o  args.o utils.o

@@ -1,12 +1,13 @@
 #include "U1.h"
 
 char fifoname[MAX_MSG_LEN];
+clock_t begin;
 
 void *thr_func(void *num){
     int fd, fd2,pl=-1;    
     int pid = getpid(), pid_s;
     int i = *(int *) num;
-    int dur = rand()%20 + 1; //generating random duration
+    int dur = rand()%20000 + 1; //generating random duration
     pthread_t tid = pthread_self(), tid_s; 
     
     //CRIAR REQUEST//
@@ -16,11 +17,10 @@ void *thr_func(void *num){
     
     if ((fd = open(fifoname, O_WRONLY)) < 0){
         regOper("CLOSD", i, pid, tid, dur, pl);
-        printf("Oops !!! Server is closed !!!\n");
-        exit(1);
+        return NULL;
+        //exit(1);
     } 
     else{
-        printf("FIFO openned in WRITEONLY mode\n");
         write(fd, msg, MAX_MSG_LEN);
         regOper("IWANT", i, pid, tid, dur, pl);
         close(fd);
@@ -35,21 +35,19 @@ void *thr_func(void *num){
         printf("Error creating answer fifo\n"); 
         exit(2);
     } 
-    else printf("All good creating fifo %s \n", privatefifo);
 
-    if ((fd2=open(privatefifo,O_RDONLY)) >= 0)
-        printf("All good opening fifo %s\n", privatefifo);
-    else{
+
+    if ((fd2=open(privatefifo,O_RDONLY)) < 0){
         regOper("FAILD", i, pid, tid, dur, pl);
+        if(unlink(privatefifo))
+            printf("Error when destroying private fifo\n");
         exit(2);
     }
+    
 
     char str[MAX_MSG_LEN];
     
     read(fd2,str,MAX_MSG_LEN);
-    /*if (n>0) 
-        printf("%s has arrived\n",str);*/
-
     close(fd2);
 
     sscanf(str, "[%d,%d,%ld,%d,%d]", &i, &pid_s, &tid_s, &dur, &pl);
@@ -61,9 +59,7 @@ void *thr_func(void *num){
 
     if (unlink(privatefifo)<0)
         printf("Error when destroying private fifo\n");
-    else
-        printf("private fifo has been destroyed\n");
-
+    
 
     return NULL;
 }
@@ -87,19 +83,18 @@ int main(int argc, char *argv[])
         printf("Usage: U1 <-t nsecs> fifoname\n");
         exit(1);
     }
-    
-    start_timeU();
+    begin = clock();
     strcpy(fifoname, args.fifoname);
 
-
-
-    while(timePassed(0) < args.nsecs){
+    while(((double)(clock() - beginTime)/CLOCKS_PER_SEC) < args.nsecs){
+        printf("Clock: %ld\n", clock());
         num[k] = k+1;
         pthread_create(&tid[k], NULL, thr_func, &num[k]);
         sleep(2);
         k++;
     }
+    
     printf("Finished work\n");
 
     pthread_exit(0);
-}   
+}     
