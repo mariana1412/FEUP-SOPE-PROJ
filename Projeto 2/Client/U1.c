@@ -2,12 +2,13 @@
 
 char fifoname[MAX_MSG_LEN];
 clock_t begin;
+int alarmOn;
 
 void *thr_func(void *num){
     int fd, fd2,pl=-1;    
     int pid = getpid(), pid_s;
     int i = *(int *) num;
-    int dur = rand()%20000 + 1; //generating random duration
+    int dur = rand()%20000 + 1;
     pthread_t tid = pthread_self(), tid_s; 
     
     //CRIAR REQUEST//
@@ -16,12 +17,13 @@ void *thr_func(void *num){
     sprintf(msg, "[%d,%d,%ld,%d,%d]", i, pid, tid, dur, pl);
     
     if ((fd = open(fifoname, O_WRONLY)) < 0){
+        fprintf(stderr, "Oops server is closed\n");
         regOper("CLOSD", i, pid, tid, dur, pl);
+        alarmOn = 0;
         return NULL;
-        //exit(1);
     } 
     else{
-        write(fd, msg, MAX_MSG_LEN);
+        if(write(fd, msg, MAX_MSG_LEN) < 0) exit(2);
         regOper("IWANT", i, pid, tid, dur, pl);
         close(fd);
     }
@@ -36,18 +38,22 @@ void *thr_func(void *num){
         exit(2);
     } 
 
-
     if ((fd2=open(privatefifo,O_RDONLY)) < 0){
         regOper("FAILD", i, pid, tid, dur, pl);
-        if(unlink(privatefifo))
+        if(unlink(privatefifo)){
             printf("Error when destroying private fifo\n");
-        exit(2);
+            exit(2);
+        }
+        return NULL;
     }
     
-
     char str[MAX_MSG_LEN];
     
-    read(fd2,str,MAX_MSG_LEN);
+    if(read(fd2,str,MAX_MSG_LEN) < 0) {
+        regOper("FAILD", i, pid, tid, dur, pl);
+        return NULL;
+    }
+    
     close(fd2);
 
     sscanf(str, "[%d,%d,%ld,%d,%d]", &i, &pid_s, &tid_s, &dur, &pl);
@@ -60,12 +66,14 @@ void *thr_func(void *num){
     if (unlink(privatefifo)<0)
         printf("Error when destroying private fifo\n");
     
-
     return NULL;
 }
 
-int main(int argc, char *argv[])
-{
+void alarm_handler(int sig) {
+    alarmOn = 0;
+}
+
+int main(int argc, char *argv[]){
     struct ArgumentFlags args;
     pthread_t tid[NUM_MAX_THREADS];
     int num[NUM_MAX_THREADS], k=0;
@@ -83,17 +91,18 @@ int main(int argc, char *argv[])
         printf("Usage: U1 <-t nsecs> fifoname\n");
         exit(1);
     }
-    begin = clock();
+    start_time();
     strcpy(fifoname, args.fifoname);
 
-    while(((double)(clock() - beginTime)/CLOCKS_PER_SEC) < args.nsecs){
-        printf("Clock: %ld\n", clock());
+    signal(SIGALRM, alarm_handler);
+    alarmOn = 1;
+    alarm(args.nsecs);
+    while(alarmOn){
         num[k] = k+1;
         pthread_create(&tid[k], NULL, thr_func, &num[k]);
-        sleep(2);
+        usleep(500*1000);
         k++;
     }
-    
     printf("Finished work\n");
 
     pthread_exit(0);

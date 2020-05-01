@@ -8,8 +8,8 @@
 #include <pthread.h> 
 #include <errno.h>
 #include <sys/time.h>
-#include "../Server/args.c"
-#include "../Server/utils.c"
+#include "../Server/args.h"
+#include "../Server/utils.h"
 
 
 
@@ -17,6 +17,7 @@
 #define NUM_MAX_THREADS 500
 
 void *thr_func(void *fname);
+void alarm_handler(int sig);
 int main(int argc, char *argv[]);
 
 #endif /*U1_H*/

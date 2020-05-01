@@ -11,7 +11,6 @@ int isNumber(char *n) {
 
 int idArguments(char *arg){
     char* nsecs = "-t";
-
     //nota: strcmp() retorn 0 quando são iguais
     if(!strcmp(arg, nsecs)){ 
         return NSECS;
@@ -19,7 +18,6 @@ int idArguments(char *arg){
     else
         return FIFONAME;
 }
-
 
 void initArgumentFlags(struct ArgumentFlags *args){
     args->nsecs = 0;
