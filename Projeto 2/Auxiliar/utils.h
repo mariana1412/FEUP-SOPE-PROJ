@@ -10,7 +10,6 @@
 #include <pthread.h>
 
 void start_time();
-double timePassed();
 void regOper();
 
 #endif /*UTILS_H*/

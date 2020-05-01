@@ -2,7 +2,8 @@
 struct ArgumentFlags args;
 int place = 0;
 int alarmOn;
- 
+static clock_t beginTime; 
+
 void alarm_handler(int sig){ alarmOn = 0; }
  
 void *thr_func(void *msgCl){
@@ -18,24 +19,24 @@ void *thr_func(void *msgCl){
  
     //SENDING ANSWERS TO REQUEST- privatefifo//
     if ((fd2=open(privatefifo,O_WRONLY)) == -1) {
-        regOper("GAVUP", i, pid_cl, tid_cl, dur, pl);
+        regOper("GAVUP", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
         return NULL;
     }
  
     char msg[MAX_MSG_LEN];
 
    
-    if(timePassed()+(dur/1000) < args.nsecs){
+    if((double)(time(NULL) - beginTime)+(dur/1000) < args.nsecs){
         place ++;
-        regOper("ENTER", i, pid_cl, tid_cl, dur, place);
+        regOper("ENTER", i, pid_cl, tid_cl, dur, place, (double)(time(NULL) - beginTime));
         sprintf(msg, "[%d,%d,%ld,%d,%d]", i, pid_s, tid_s, dur, place);
         if(write(fd2, msg, MAX_MSG_LEN) < 0) exit(2);
         usleep(dur);
-        regOper("TIMUP", i, pid_cl, tid_cl, dur, place);
+        regOper("TIMUP", i, pid_cl, tid_cl, dur, place, (double)(time(NULL) - beginTime));
     }
     else{
         dur =-1;
-        regOper("2LATE", i, pid_cl, tid_cl, dur, pl);
+        regOper("2LATE", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
         sprintf(msg, "[%d,%d,%ld,%d,%d]", i, pid_s, tid_s, dur,pl);
         if(write(fd2, msg, MAX_MSG_LEN) < 0) exit(2);
  
@@ -64,7 +65,10 @@ int main(int argc, char *argv[]){
         exit(1);
     }
  
-    start_time();
+    beginTime = time(NULL);
+    signal(SIGALRM, alarm_handler);
+    alarmOn = 1;
+    alarm(args.nsecs);
  
     if (mkfifo(args.fifoname,0660)<0) {
         if (errno==EEXIST) printf("FIFO already exists\n");
@@ -77,9 +81,7 @@ int main(int argc, char *argv[]){
     }
  
     //READS REQUEST//
-    signal(SIGALRM, alarm_handler);
-    alarmOn = 1;
-    alarm(args.nsecs);
+    
     while (alarmOn){
         if((bytesread = read( fd, &str, MAX_MSG_LEN - 1)) > 0){
             str[bytesread] = '\0';
@@ -89,7 +91,7 @@ int main(int argc, char *argv[]){
                 pid_cl = 0;
  
                 sscanf(str, "[%d,%d,%d,%d,%d]", &i, &pid_cl, &tid_cl, &dur, &pl);
-                regOper("RECVD", i, pid_cl, tid_cl, dur, pl);
+                regOper("RECVD", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
                 pthread_create(&tid[k], NULL, thr_func, str);//sends the read message to the thread
                 pthread_detach(tid[k]);
                 k++;

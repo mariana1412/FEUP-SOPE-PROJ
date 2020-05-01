@@ -3,6 +3,7 @@
 char fifoname[MAX_MSG_LEN];
 clock_t begin;
 int alarmOn;
+static clock_t beginTime; 
  
 void alarm_handler(int sig){ alarmOn = 0;}
  
@@ -22,7 +23,7 @@ void *thr_func(void *num)
     if ((fd = open(fifoname, O_WRONLY)) < 0)
     {
         fprintf(stderr, "Oops server is closed\n");
-        regOper("CLOSD", i, pid, tid, dur, pl);
+        regOper("CLOSD", i, pid, tid, dur, pl, (double)(time(NULL) - beginTime));
         alarmOn = 0;
         return NULL;
     }
@@ -30,7 +31,7 @@ void *thr_func(void *num)
     {
         if (write(fd, msg, MAX_MSG_LEN) < 0)
             exit(2);
-        regOper("IWANT", i, pid, tid, dur, pl);
+        regOper("IWANT", i, pid, tid, dur, pl, (double)(time(NULL) - beginTime));
         close(fd);
     }
     //
@@ -47,7 +48,7 @@ void *thr_func(void *num)
  
     if ((fd2 = open(privatefifo, O_RDONLY)) < 0)
     {
-        regOper("FAILD", i, pid, tid, dur, pl);
+        regOper("FAILD", i, pid, tid, dur, pl, (double)(time(NULL) - beginTime));
         close(fd2);
         if (unlink(privatefifo))
         {
@@ -61,7 +62,7 @@ void *thr_func(void *num)
  
     if (read(fd2, str, MAX_MSG_LEN) < 0)
     {
-        regOper("FAILD", i, pid, tid, dur, pl);
+        regOper("FAILD", i, pid, tid, dur, pl, (double)(time(NULL) - beginTime));
         close(fd2);
         if (unlink(privatefifo))
         {
@@ -75,9 +76,9 @@ void *thr_func(void *num)
  
     sscanf(str, "[%d,%d,%ld,%d,%d]", &i, &pid_s, &tid_s, &dur, &pl);
     if ((pl == -1) && (dur = -1))
-        regOper("CLOSD", i, pid_s, tid_s, dur, pl);
+        regOper("CLOSD", i, pid_s, tid_s, dur, pl, (double)(time(NULL) - beginTime));
     else
-        regOper("IAMIN", i, pid_s, tid_s, dur, pl);
+        regOper("IAMIN", i, pid_s, tid_s, dur, pl, (double)(time(NULL) - beginTime));
     ////
     if (unlink(privatefifo)< 0)
         printf("Error when destroying private fifo\n");
@@ -106,12 +107,14 @@ int main(int argc, char *argv[])
         printf("Usage: U1 <-t nsecs> fifoname\n");
         exit(1);
     }
-    start_time();
+    
     strcpy(fifoname, args.fifoname);
- 
+
+    beginTime = time(NULL);
     signal(SIGALRM, alarm_handler);
     alarmOn = 1;
     alarm(args.nsecs);
+    
     while (alarmOn)
     {
         num[k] = k + 1;
@@ -122,5 +125,5 @@ int main(int argc, char *argv[])
     }
     printf("Finished work\n");
  
-    pthread_exit(0);
+    exit(0);
 }
