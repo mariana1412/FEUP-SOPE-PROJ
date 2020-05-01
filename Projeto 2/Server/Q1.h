@@ -10,8 +10,8 @@
 #include <errno.h>
 #include <string.h>
 #include <pthread.h>
-#include "args.h"
-#include "utils.h"
+#include "../Auxiliar/args.h"
+#include "../Auxiliar/utils.h"
 
 #define MAX_MSG_LEN 500
 #define NUM_MAX_THREADS 500 //fuck my life
