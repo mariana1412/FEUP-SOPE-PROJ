@@ -8,8 +8,8 @@
 #include <pthread.h> 
 #include <errno.h>
 #include <sys/time.h>
-#include "../Server/args.h"
-#include "../Server/utils.h"
+#include "args.h"
+#include "utils.h"
 
 
 
