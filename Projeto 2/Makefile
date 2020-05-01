@@ -17,4 +17,4 @@ Q1: $(QOBJ) $(AOBJ)
 	$(CC) $(CFLAGS) $(AOBJ) $(QOBJ) -o $@
 
 clean:
-	rm $(UOBJ) $(AOBJ) $(QOBJ) $(Targets) 
+	rm $(UOBJ) $(QOBJ) $(AOBJ) $(TARGETS) 
