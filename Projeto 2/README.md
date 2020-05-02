@@ -1,5 +1,11 @@
 # READ ME 
 
+## Objetivos
+ * criar programas multithread;
+ * promover a intercomunicação entre processos através de canais com nome (named pipes ou FIFOs);
+ * evitar conflitos entre entidades concorrentes, por via de mecanismos de sincronização.
+
+
 ## Funcionalidades implementadas
 
 O programa desenvolvido contém todas as features pretendidas no enunciado, todas a funcionar bem.
