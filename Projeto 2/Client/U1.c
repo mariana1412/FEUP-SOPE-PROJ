@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
         num[k] = k + 1;
         pthread_create(&tid[k], NULL, thr_func, &num[k]);
         pthread_detach(tid[k]);
-        usleep(500 * 1000);
+        usleep(50*1000);
         k++;
     }
     printf("Finished work\n");
