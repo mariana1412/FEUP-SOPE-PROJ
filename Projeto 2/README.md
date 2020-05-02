@@ -2,7 +2,7 @@
 
 ## Funcionalidades implementadas
 
-O programa desenvolvido contém todas as features pretendidas no enunciados, todas as funcionar bem.
+O programa desenvolvido contém todas as features pretendidas no enunciado, todas a funcionar bem.
 
 ## Detalhes de implementação
 
