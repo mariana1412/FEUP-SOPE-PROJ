@@ -126,5 +126,5 @@ int main(int argc, char *argv[])
     }
     fprintf(stderr,"Finished work\n");
  
-    exit(0);
+    return 0;
 }

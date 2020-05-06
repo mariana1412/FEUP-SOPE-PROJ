@@ -135,9 +135,11 @@ int main(int argc, char *argv[]){
                 j++;
             }
     }
-    printf("Hi!\n");
+    //printf("Hi!\n");
+    
     close(fd);
     fprintf(stderr,"Bathroom is closed\n");
-    pthread_exit(0);
+    //pthread_exit(0);
+    printf("Well hi!\n");
     return 0;
 }
