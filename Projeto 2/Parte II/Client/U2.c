@@ -42,7 +42,7 @@ void *thr_func(void *num)
  
     if (mkfifo(privatefifo, 0660) < 0)
     {
-        printf("Error creating answer fifo\n");
+        fprintf(stderr,"Error creating answer fifo\n");
         exit(2);
     }
  
@@ -52,7 +52,7 @@ void *thr_func(void *num)
         close(fd2);
         if (unlink(privatefifo))
         {
-            printf("Error when destroying private fifo\n");
+            fprintf(stderr,"Error when destroying private fifo\n");
             exit(2);
         }
         return NULL;
@@ -66,7 +66,7 @@ void *thr_func(void *num)
         close(fd2);
         if (unlink(privatefifo))
         {
-            printf("Error when destroying private fifo\n");
+            fprintf(stderr,"Error when destroying private fifo\n");
             exit(2);
         }
         return NULL;
@@ -81,7 +81,7 @@ void *thr_func(void *num)
         regOper("IAMIN", i, pid_s, tid_s, dur, pl, (double)(time(NULL) - beginTime));
     ////
     if (unlink(privatefifo)< 0)
-        printf("Error when destroying private fifo\n");
+        fprintf(stderr,"Error when destroying private fifo\n");
  
     return NULL;
 }
@@ -91,20 +91,21 @@ int main(int argc, char *argv[])
     struct ArgumentFlags args;
     pthread_t tid[NUM_MAX_THREADS];
     int num[NUM_MAX_THREADS], k = 0;
- 
+    
+
     srand(time(NULL));
  
     if (argc != 4)
     {
-        printf("Usage: U2 <-t nsecs> fifoname\n");
+        fprintf(stderr,"Usage: U2 <-t nsecs> fifoname\n");
         exit(1);
     }
  
     initArgumentFlags(&args);
  
-    if (parseArguments(argc, argv, &args) != 0)
+    if (parseArgumentsClient(argc, argv, &args) != 0)
     {
-        printf("Usage: U2 <-t nsecs> fifoname\n");
+        fprintf(stderr,"Usage: U2 <-t nsecs> fifoname\n");
         exit(1);
     }
     
@@ -123,7 +124,7 @@ int main(int argc, char *argv[])
         usleep(15*1000);
         k++;
     }
-    printf("Finished work\n");
+    fprintf(stderr,"Finished work\n");
  
     exit(0);
 }

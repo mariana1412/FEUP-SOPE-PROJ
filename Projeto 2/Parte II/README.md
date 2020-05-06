@@ -19,7 +19,7 @@ O programa desenvolvido contém todas as features pretendidas no enunciado, toda
 * O pedido de um cliente é atendido, independentemente do seu tempo de duração ultrapassar ou não o que resta de execução. Se este pedido foi recebido antes da casa de banho fechar ele é atendido.
 O programa do servidor só termina após responder a todos os pedidos recebidos até fechar.
 
-
+8
 ### Programa do Cliente (U1)
 * O programa do cliente lança pedidos com um curto intervalo entre pedidos (15ms),por forma a exacerbar condições de competição. Termina após passar o tempo de execução fornecido pelo utilizador ou até o servidor fechar.
 

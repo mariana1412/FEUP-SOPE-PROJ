@@ -28,6 +28,7 @@ int idArguments(char *arg){
 }
 
 void initArgumentFlags(struct ArgumentFlags *args){
+    
     args->nsecs = 0;
     args->nthreads = INT_MAX;
     args->nplaces = INT_MAX;
@@ -36,6 +37,7 @@ void initArgumentFlags(struct ArgumentFlags *args){
 int parseArgumentsClient(int argc, char *argv[], struct ArgumentFlags *args){
     for(int i = 1; i < argc; i++){
         int id = idArguments(argv[i]); 
+        
         switch(id){
             case NSECS:
                 if((i+1) < argc)

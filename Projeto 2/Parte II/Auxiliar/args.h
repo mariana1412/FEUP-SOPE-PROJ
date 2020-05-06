@@ -25,7 +25,8 @@ struct ArgumentFlags{
 };
 
 int idArguments(char *arg);
-int parseArguments(int argc, char *argv[], struct ArgumentFlags *args);
+int parseArgumentsClient(int argc, char *argv[], struct ArgumentFlags *args);
+int parseArgumentsServer(int argc, char *argv[], struct ArgumentFlags *args);
 void initArgumentFlags(struct ArgumentFlags *args);
 void checkFlags(struct ArgumentFlags* args);
 

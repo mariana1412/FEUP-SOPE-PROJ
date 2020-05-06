@@ -1,5 +1,5 @@
-#ifndef Q1_H
-#define Q1_H
+#ifndef Q2_H
+#define Q2_H
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -14,10 +14,11 @@
 #include "../Auxiliar/utils.h"
 
 #define MAX_MSG_LEN 500
-#define NUM_MAX_THREADS 1024 
+#define NUM_MAX_THREADS 4096
 
-void *thr_func(void *fname);
+void *thr_funcStandard(void *fname);
+void *thr_funcClosed(void *msgCl);
 int main(int argc, char *argv[]);
 
 
-#endif /*Q1_H*/
+#endif /*Q2_H*/

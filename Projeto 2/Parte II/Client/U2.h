@@ -1,5 +1,5 @@
-#ifndef U1_H
-#define U1_H
+#ifndef U2_H
+#define U2_H
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -14,10 +14,10 @@
 
 
 #define MAX_MSG_LEN 255
-#define NUM_MAX_THREADS 1024
+#define NUM_MAX_THREADS 4096
 
 void *thr_func(void *fname);
 void alarm_handler(int sig);
 int main(int argc, char *argv[]);
 
-#endif /*U1_H*/
+#endif /*U2_H*/

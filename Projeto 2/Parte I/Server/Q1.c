@@ -48,6 +48,7 @@ void *thr_func(void *msgCl){
  
 
 int main(int argc, char *argv[]){
+    printf("ola \n");
     int fd, i, pid_cl, tid_cl, dur, pl, k=0, bytesread;
     char str[MAX_MSG_LEN];    
     pthread_t tid[NUM_MAX_THREADS];
@@ -97,11 +98,9 @@ int main(int argc, char *argv[]){
             }
         }
     }
-     
-
-    close(fd);
+    
     if (unlink(args.fifoname)<0) printf("Error when destroying FIFO\n");
-
+    close(fd);
     printf("Bathroom is closed\n");
     pthread_exit(0);
 }

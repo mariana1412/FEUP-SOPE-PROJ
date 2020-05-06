@@ -10,10 +10,10 @@ all: U2 Q2
 %.o: %.c 
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-U1: $(UOBJ) $(AOBJ)
+U2: $(UOBJ) $(AOBJ)
 	$(CC) $(CFLAGS) $(AOBJ) $(UOBJ) -o $@
 
-Q1: $(QOBJ) $(AOBJ)
+Q2: $(QOBJ) $(AOBJ)
 	$(CC) $(CFLAGS) $(AOBJ) $(QOBJ) -o $@
 
 clean:

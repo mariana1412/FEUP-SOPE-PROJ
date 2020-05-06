@@ -14,7 +14,7 @@
 
 
 #define MAX_MSG_LEN 255
-#define NUM_MAX_THREADS 1024
+#define NUM_MAX_THREADS 4096
 
 void *thr_func(void *fname);
 void alarm_handler(int sig);
