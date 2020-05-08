@@ -30,8 +30,8 @@ int idArguments(char *arg){
 void initArgumentFlags(struct ArgumentFlags *args){
     
     args->nsecs = 0;
-    args->nthreads = INT_MAX;
-    args->nplaces = INT_MAX;
+    args->nthreads = 0;
+    args->nplaces = 0;
     args->fifoname = "/tmp/requests";
 }
 int parseArgumentsClient(int argc, char *argv[], struct ArgumentFlags *args){

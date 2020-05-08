@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -Wall -pthread
 UOBJ = Client/U2.o
-QOBJ = Server/Q2.o
-AOBJ = Auxiliar/utils.o Auxiliar/args.o
+QOBJ = Server/Q2.o Server/Queue.o
+AOBJ = Auxiliar/utils.o Auxiliar/args.o 
 TARGETS = U2 Q2
 
 all: U2 Q2

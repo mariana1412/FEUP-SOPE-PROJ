@@ -12,6 +12,8 @@
 #include <pthread.h>
 #include "../Auxiliar/args.h"
 #include "../Auxiliar/utils.h"
+#include "Queue.h"
+#include <semaphore.h>
 
 #define MAX_MSG_LEN 500
 #define NUM_MAX_THREADS 4096
