@@ -100,9 +100,19 @@ void *thr_funcClosed(void *msgCl){
         dur =-1;
         regOper("2LATE", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
         sprintf(msg, "[%d,%d,%ld,%d,%d]", i, pid_s, tid_s, dur,pl);
-        if(write(fd2, msg, MAX_MSG_LEN) < 0) exit(2);
+        if(write(fd2, msg, MAX_MSG_LEN) < 0){
+            regOper("GAVUP", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
+            close(fd2);
+            if(args.nthreads){
+                sem_post(&nthreads);
+            }
+            return NULL;
+        } 
     }
     close(fd2);
+     if(args.nthreads){
+        sem_post(&nthreads);
+    }
  
     return NULL;
 }
@@ -133,12 +143,15 @@ int main(int argc, char *argv[]){
  
     if (mkfifo(args.fifoname,0660)<0) {
         if (errno==EEXIST) fprintf(stderr, "FIFO already exists\n");
-        else fprintf(stderr,"Can't create FIFO\n");
+        else fprintf(stderr,"Can't create FIFO\n"); 
+        exit(2);
     }  
  
     if ((fd = open(args.fifoname, O_RDONLY)) < 0) {
-        unlink(args.fifoname);
-        pthread_exit(NULL);
+        fprintf(stderr, "Can't open public fifo for reading \n");
+        if(unlink(args.fifoname)<0)
+             fprintf(stderr,"Error when destroying FIFO\n");
+       exit(3);
     }
  
     //READS REQUEST//
@@ -176,6 +189,7 @@ int main(int argc, char *argv[]){
     if (unlink(args.fifoname) < 0) fprintf(stderr,"Error when destroying FIFO\n");
     int n=0;
     int j = k;
+
     while((n=read(fd,&str,MAX_MSG_LEN-1)>0)){
         str[bytesread] = '\0';
         if(str[0] == '[' && str[strlen(str)-1] == ']'){
