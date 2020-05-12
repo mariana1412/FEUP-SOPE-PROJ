@@ -11,7 +11,7 @@ sem_t nplaces;
 void alarm_handler(int sig){ alarmOn = 0; }
  
 void *thr_funcStandard(void *msgCl){
-    //pthread_detach(pthread_self());
+    pthread_detach(pthread_self());
     int fd2;
     int pid_s = getpid(), pid_cl = 0, i, pl =- 1, dur = 0;
     pthread_t tid_s = pthread_self(), tid_cl = 0;
@@ -74,11 +74,10 @@ void *thr_funcStandard(void *msgCl){
         
     }
    
-    
- 
     return NULL;
 }
 void *thr_funcClosed(void *msgCl){
+    pthread_detach(pthread_self());
     int fd2;
     int pid_s = getpid(), pid_cl = 0, i, pl =- 1, dur = 0;
     pthread_t tid_s = pthread_self(), tid_cl = 0;
@@ -162,6 +161,7 @@ int main(int argc, char *argv[]){
     }
     else
         tid = malloc(sizeof(pthread_t)*NUM_MAX_THREADS);
+
     if (args.nplaces != 0) {
         sem_init(&nplaces, 0, args.nplaces);
         createQueue(args.nplaces, &wcQueue);
@@ -183,9 +183,13 @@ int main(int argc, char *argv[]){
 
                 pthread_create(&tid[k], NULL, thr_funcStandard, str);//sends the read message to the thread
                 k++;
+                if(args.nthreads)
+                    k %= args.nthreads;
             }
         }
     }
+    //ps -u para ver o pid 
+    //watch -n 0.05 ps -o thcount <pid>
     if (unlink(args.fifoname) < 0) fprintf(stderr,"Error when destroying FIFO\n");
     int n=0;
     int j = k;
@@ -205,11 +209,13 @@ int main(int argc, char *argv[]){
                     
                 pthread_create(&tid[j], NULL, thr_funcClosed, str);//sends the read message to the thread
                 j++;
+                if(args.nthreads)
+                    j %= args.nthreads;
             }
     }
     free(tid);
     close(fd);
     fprintf(stderr,"Bathroom is closed\n");
     
-    return 0;
+    pthread_exit(0);
 }

@@ -30,7 +30,7 @@ int size(struct Queue* q) {
 }  
 
 void insert(int data, struct Queue* q) {
-
+   printf("está livre %d\n", data);
    if(!isFull(q)) {
 	
       if(q->rear == q->capacity - 1 ) {
@@ -43,13 +43,16 @@ void insert(int data, struct Queue* q) {
 }
 
 int removeData(struct Queue *q) {
-    if(isEmpty(q))
+   if(isEmpty(q))
         return 0;
+
    int data = q->queue[q->front++];
    if(q->front == q->capacity) {
       q->front = 0;
    }
 	
    q->size--;
+   printf("estou na casa de banho %d\n", data);
+   
    return data;  
 }

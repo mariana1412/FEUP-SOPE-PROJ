@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
         num[k] = k + 1;
         pthread_create(&tid[k], NULL, thr_func, &num[k]);
         pthread_detach(tid[k]);
-        usleep(15*1000);
+        usleep(30*1000);
         k++;
     }
     fprintf(stderr,"Finished work\n");
