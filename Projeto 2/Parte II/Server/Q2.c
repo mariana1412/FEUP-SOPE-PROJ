@@ -25,12 +25,12 @@ void *thr_funcStandard(void *msgCl){
     sprintf(privatefifo, "/tmp/%d.%ld", pid_cl, tid_cl);
     //SENDING ANSWERS TO REQUEST- privatefifo//
 
-    while(((fd2=open(privatefifo,O_WRONLY)) <= 0) && tries<5) {
+    while(((fd2=open(privatefifo,O_WRONLY)) <= 0) && tries<3) {
         usleep(3000);
         tries++;
     }
 
-    if(tries == 5){
+    if(tries == 3){
         regOper("GAVUP", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
         if(args.nthreads){
             sem_post(&nthreads);

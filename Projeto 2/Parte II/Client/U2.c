@@ -14,7 +14,17 @@ void *thr_func(void *num){
     int dur = rand() % 20000 + 1;
     pthread_t tid = pthread_self(), tid_s;
  
-    //CREATE REQUEST//
+    
+    char privatefifo[MAX_MSG_LEN];
+    sprintf(privatefifo, "/tmp/%d.%ld", pid, tid);
+ 
+    if (mkfifo(privatefifo, 0660) < 0)
+    {
+        fprintf(stderr,"Error creating answer fifo\n");
+        exit(2);
+    }
+ 
+    //CREATE REQUEST//  
     char msg[MAX_MSG_LEN];
  
     sprintf(msg, "[%d,%d,%ld,%d,%d]", i, pid, tid, dur, pl);
@@ -36,15 +46,6 @@ void *thr_func(void *num){
     //
  
     //READ RESPOSTA//
-    char privatefifo[MAX_MSG_LEN];
-    sprintf(privatefifo, "/tmp/%d.%ld", pid, tid);
- 
-    if (mkfifo(privatefifo, 0660) < 0)
-    {
-        fprintf(stderr,"Error creating answer fifo\n");
-        exit(2);
-    }
- 
     if ((fd2 = open(privatefifo, O_RDONLY)) < 0)
     {
         regOper("FAILD", i, pid, tid, dur, pl, (double)(time(NULL) - beginTime));
@@ -59,12 +60,12 @@ void *thr_func(void *num){
  
     char str[MAX_MSG_LEN];
  
-    while((read(fd2, str, MAX_MSG_LEN) <= 0) && tries<5) 
+    while((read(fd2, str, MAX_MSG_LEN) <= 0) && tries<3) 
     {
         usleep(3000);
         tries++;   
     }
-    if(tries == 5){
+    if(tries == 3){
         regOper("FAILD", i, pid, tid, dur, pl, (double)(time(NULL) - beginTime));
         close(fd2);
         if (unlink(privatefifo))
@@ -125,7 +126,7 @@ int main(int argc, char *argv[])
         num[k] = k + 1;
         pthread_create(&tid[k], NULL, thr_func, &num[k]);
         pthread_detach(tid[k]);
-        usleep(30*1000);
+        usleep(10*1000);
         k++;
     }
     fprintf(stderr,"Finished work\n");
