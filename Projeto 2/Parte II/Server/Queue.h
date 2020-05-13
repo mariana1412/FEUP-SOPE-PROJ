@@ -17,6 +17,7 @@ int isFull(struct Queue* q);
 int size(struct Queue* q);
 void insert(int data, struct Queue* q);
 int removeData(struct Queue *q);
+void printQueue(struct Queue *q);
 
 
 

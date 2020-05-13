@@ -1,4 +1,5 @@
 #include "Q2.h"
+
 struct ArgumentFlags args;
 int place = 0;
 int alarmOn;
@@ -7,6 +8,7 @@ static struct Queue wcQueue;
 pthread_mutex_t placeMutex = PTHREAD_MUTEX_INITIALIZER;
 sem_t nthreads;
 sem_t nplaces;
+
 
 void alarm_handler(int sig){ alarmOn = 0; }
  
@@ -35,15 +37,19 @@ void *thr_funcStandard(void *msgCl){
 
    
     if(alarmOn){
+        
+      
         if(args.nplaces){
+            
             sem_wait(&nplaces);
             pthread_mutex_lock(&placeMutex);
             place = removeData(&wcQueue);
+            printQueue(&wcQueue);
             pthread_mutex_unlock(&placeMutex);
         }
         else{
             pthread_mutex_lock(&placeMutex);
-            place ++;
+            place++;
             pthread_mutex_unlock(&placeMutex);
         }
         regOper("ENTER", i, pid_cl, tid_cl, dur, place, (double)(time(NULL) - beginTime));
@@ -52,6 +58,7 @@ void *thr_funcStandard(void *msgCl){
             if(args.nplaces){
                 pthread_mutex_lock(&placeMutex);
                 insert(place,&wcQueue);//ver isto
+                printQueue(&wcQueue);
                 pthread_mutex_unlock(&placeMutex);
                 sem_post(&nplaces);
             }
@@ -64,10 +71,13 @@ void *thr_funcStandard(void *msgCl){
         usleep(dur);
         regOper("TIMUP", i, pid_cl, tid_cl, dur, place, (double)(time(NULL) - beginTime));
         close(fd2);
-        if(args.nthreads){sem_post(&nthreads);}
+        if(args.nthreads){
+            sem_post(&nthreads);
+        }
         if(args.nplaces){
             pthread_mutex_lock(&placeMutex);
             insert(place, &wcQueue);
+            printQueue(&wcQueue);
             pthread_mutex_unlock(&placeMutex);
             sem_post(&nplaces);
         }
@@ -119,7 +129,7 @@ void *thr_funcClosed(void *msgCl){
 int main(int argc, char *argv[]){
     int fd, i, pid_cl, tid_cl, dur, pl, k=0, bytesread;
     char str[MAX_MSG_LEN];    
-    
+    pthread_t* tid;
    
     if (argc != 4 && argc != 6 && argc != 8) {
         fprintf(stderr,"Usage: Q2 <-t nsecs> [-l nplaces] [-n nthreads] fifoname\n");
@@ -133,7 +143,8 @@ int main(int argc, char *argv[]){
         exit(1);
     }
 
-    pthread_t* tid;
+    checkFlags(&args);
+
 
     beginTime = time(NULL);
     signal(SIGALRM, alarm_handler);
@@ -166,7 +177,7 @@ int main(int argc, char *argv[]){
         sem_init(&nplaces, 0, args.nplaces);
         createQueue(args.nplaces, &wcQueue);
     }
-    
+ 
     while (alarmOn){
         if((bytesread = read( fd, &str, MAX_MSG_LEN - 1)) > 0){
             str[bytesread] = '\0';
@@ -180,16 +191,15 @@ int main(int argc, char *argv[]){
 
                 if(args.nthreads != 0)
                     sem_wait(&nthreads);
-
                 pthread_create(&tid[k], NULL, thr_funcStandard, str);//sends the read message to the thread
                 k++;
-                if(args.nthreads)
-                    k %= args.nthreads;
+                if(args.nthreads){
+                    k = k % args.nthreads;
+                }
             }
         }
     }
-    //ps -u para ver o pid 
-    //watch -n 0.05 ps -o thcount <pid>
+
     if (unlink(args.fifoname) < 0) fprintf(stderr,"Error when destroying FIFO\n");
     int n=0;
     int j = k;
@@ -213,9 +223,14 @@ int main(int argc, char *argv[]){
                     j %= args.nthreads;
             }
     }
+
     free(tid);
     close(fd);
     fprintf(stderr,"Bathroom is closed\n");
     
     pthread_exit(0);
 }
+
+//ps -u para ver o pid 
+//watch -n 0.05 ps -o thcount <pid>
+

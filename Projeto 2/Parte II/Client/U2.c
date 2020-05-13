@@ -7,12 +7,11 @@ static clock_t beginTime;
  
 void alarm_handler(int sig){ alarmOn = 0;}
  
-void *thr_func(void *num)
-{
+void *thr_func(void *num){
     int fd, fd2, pl = -1;
     int pid = getpid(), pid_s;
     int i = *(int *)num;
-    int dur = rand() % 20000 + 1;
+    int dur = 2000000;//rand() % 20000 + 2000000;
     pthread_t tid = pthread_self(), tid_s;
  
     //CREATE REQUEST//
@@ -126,6 +125,6 @@ int main(int argc, char *argv[])
         k++;
     }
     fprintf(stderr,"Finished work\n");
- 
+    
     return 0;
 }
