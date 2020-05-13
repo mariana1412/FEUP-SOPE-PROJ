@@ -8,10 +8,10 @@ static clock_t beginTime;
 void alarm_handler(int sig){ alarmOn = 0;}
  
 void *thr_func(void *num){
-    int fd, fd2, pl = -1;
+    int fd, fd2, pl = -1, tries = 0;
     int pid = getpid(), pid_s;
     int i = *(int *)num;
-    int dur = 2000000;//rand() % 20000 + 2000000;
+    int dur = rand() % 20000 + 1;
     pthread_t tid = pthread_self(), tid_s;
  
     //CREATE REQUEST//
@@ -59,25 +59,30 @@ void *thr_func(void *num){
  
     char str[MAX_MSG_LEN];
  
-    if (read(fd2, str, MAX_MSG_LEN) < 0)
+    while((read(fd2, str, MAX_MSG_LEN) <= 0) && tries<5) 
     {
+        usleep(3000);
+        tries++;   
+    }
+    if(tries == 5){
         regOper("FAILD", i, pid, tid, dur, pl, (double)(time(NULL) - beginTime));
         close(fd2);
         if (unlink(privatefifo))
-        {
+        {   
             fprintf(stderr,"Error when destroying private fifo\n");
             exit(2);
-        }
+        }   
         return NULL;
     }
- 
     close(fd2);
+    printf("Destroyed privatefifo: %s , request %d\n", privatefifo, i);
  
     sscanf(str, "[%d,%d,%ld,%d,%d]", &i, &pid_s, &tid_s, &dur, &pl);
     if ((pl == -1) && (dur = -1))
         regOper("CLOSD", i, pid_s, tid_s, dur, pl, (double)(time(NULL) - beginTime));
     else
         regOper("IAMIN", i, pid_s, tid_s, dur, pl, (double)(time(NULL) - beginTime));
+    
     ////
     if (unlink(privatefifo)< 0)
         fprintf(stderr,"Error when destroying private fifo\n");
@@ -121,7 +126,7 @@ int main(int argc, char *argv[])
         num[k] = k + 1;
         pthread_create(&tid[k], NULL, thr_func, &num[k]);
         pthread_detach(tid[k]);
-        usleep(30*1000);
+        usleep(10*1000);
         k++;
     }
     fprintf(stderr,"Finished work\n");

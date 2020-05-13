@@ -10,6 +10,9 @@ struct Queue{
     unsigned *queue;
     
 };
+/*
+@
+*/
 void createQueue(unsigned capacity, struct Queue* q);
 int peek(struct Queue* q);
 int isEmpty(struct Queue* q);

@@ -31,7 +31,7 @@ int size(struct Queue* q) {
 
 // function to insert an element at the rear of the queue 
 void insert(int data, struct Queue* q) {
-   printf("está livre %d\n", data);
+   fprintf(stderr,"está livre %d\n", data);
    if(!isFull(q)) {
 	
       if(q->rear == q->capacity - 1 ) {
@@ -44,9 +44,9 @@ void insert(int data, struct Queue* q) {
 }
  // function to delete an element from the front of the queue 
 int removeData(struct Queue *q) {
-   if(isEmpty(q))//if the queue is empty 
-        return 0;
 
+   if(isEmpty(q)) return 0;
+        
    int data = q->queue[q->front];
    if(q->front == q->capacity) {
       q->front = 0;
@@ -55,11 +55,11 @@ int removeData(struct Queue *q) {
       for (int i = 0; i < q->rear; i++) { 
          q->queue[i] = q->queue[i + 1]; 
       } 
-  
    }
+
    q->size--;
    q->rear--;
-   printf("estou na casa de banho %d\n", data);
+   fprintf(stderr,"estou na casa de banho %d\n", data);
    
    return data;  
 }

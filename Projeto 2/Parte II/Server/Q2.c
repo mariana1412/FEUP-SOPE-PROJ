@@ -1,8 +1,8 @@
 #include "Q2.h"
 
 struct ArgumentFlags args;
-int place = 0;
 int alarmOn;
+int place=0;
 static clock_t beginTime; 
 static struct Queue wcQueue;
 pthread_mutex_t placeMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -15,6 +15,7 @@ void alarm_handler(int sig){ alarmOn = 0; }
 void *thr_funcStandard(void *msgCl){
     pthread_detach(pthread_self());
     int fd2;
+    int placeDef = 0;
     int pid_s = getpid(), pid_cl = 0, i, pl =- 1, dur = 0;
     pthread_t tid_s = pthread_self(), tid_cl = 0;
     char privatefifo[MAX_MSG_LEN];
@@ -23,9 +24,13 @@ void *thr_funcStandard(void *msgCl){
     sscanf((char *) msgCl, "[%d,%d,%ld,%d,%d]", &i, &pid_cl, &tid_cl, &dur, &pl);
    
     sprintf(privatefifo, "/tmp/%d.%ld", pid_cl, tid_cl);
- 
+    printf("Priavte fifo: %s \n", privatefifo);
     //SENDING ANSWERS TO REQUEST- privatefifo//
     if ((fd2=open(privatefifo,O_WRONLY)) == -1) {
+        printf("Tid do servidor: %ld\n", tid_s);
+        printf("Tid do cliente: %ld\n", tid_cl);
+
+        printf("Oh dear, something went wrong with read()! %s\n", strerror(errno));
         regOper("GAVUP", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
         if(args.nthreads){
             sem_post(&nthreads);
@@ -37,28 +42,28 @@ void *thr_funcStandard(void *msgCl){
 
    
     if(alarmOn){
-        
       
         if(args.nplaces){
-            
             sem_wait(&nplaces);
             pthread_mutex_lock(&placeMutex);
-            place = removeData(&wcQueue);
-            printQueue(&wcQueue);
+            placeDef = removeData(&wcQueue);
             pthread_mutex_unlock(&placeMutex);
+            regOper("ENTER", i, pid_cl, tid_cl, dur, placeDef, (double)(time(NULL) - beginTime));
+            sprintf(msg, "[%d,%d,%ld,%d,%d]", i, pid_s, tid_s, dur, placeDef);
         }
         else{
             pthread_mutex_lock(&placeMutex);
             place++;
             pthread_mutex_unlock(&placeMutex);
+            regOper("ENTER", i, pid_cl, tid_cl, dur, place, (double)(time(NULL) - beginTime));
+            sprintf(msg, "[%d,%d,%ld,%d,%d]", i, pid_s, tid_s, dur, place);
         }
-        regOper("ENTER", i, pid_cl, tid_cl, dur, place, (double)(time(NULL) - beginTime));
-        sprintf(msg, "[%d,%d,%ld,%d,%d]", i, pid_s, tid_s, dur, place);
+        printf("Tid do servidor: %ld\n", tid_s);
+        printf("Tid do cliente: %ld\n", tid_cl);
         if(write(fd2, msg, MAX_MSG_LEN) < 0){
             if(args.nplaces){
                 pthread_mutex_lock(&placeMutex);
-                insert(place,&wcQueue);//ver isto
-                printQueue(&wcQueue);
+                insert(placeDef,&wcQueue);
                 pthread_mutex_unlock(&placeMutex);
                 sem_post(&nplaces);
             }
@@ -69,19 +74,20 @@ void *thr_funcStandard(void *msgCl){
             return NULL;
         }
         usleep(dur);
-        regOper("TIMUP", i, pid_cl, tid_cl, dur, place, (double)(time(NULL) - beginTime));
         close(fd2);
         if(args.nthreads){
             sem_post(&nthreads);
         }
         if(args.nplaces){
             pthread_mutex_lock(&placeMutex);
-            insert(place, &wcQueue);
-            printQueue(&wcQueue);
+            insert(placeDef, &wcQueue);
             pthread_mutex_unlock(&placeMutex);
             sem_post(&nplaces);
+            regOper("TIMUP", i, pid_cl, tid_cl, dur, placeDef, (double)(time(NULL) - beginTime));
+        }  
+        else{
+            regOper("TIMUP", i, pid_cl, tid_cl, dur, place, (double)(time(NULL) - beginTime));
         }
-        
     }
    
     return NULL;
@@ -100,6 +106,7 @@ void *thr_funcClosed(void *msgCl){
  
     //SENDING ANSWERS TO REQUEST- privatefifo//
     if ((fd2=open(privatefifo,O_WRONLY)) == -1) {
+
         regOper("GAVUP", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
         return NULL;
     }
@@ -123,7 +130,7 @@ void *thr_funcClosed(void *msgCl){
         sem_post(&nthreads);
     }
  
-    return NULL;
+    pthread_exit(NULL);
 }
 
 int main(int argc, char *argv[]){
@@ -177,6 +184,7 @@ int main(int argc, char *argv[]){
         sem_init(&nplaces, 0, args.nplaces);
         createQueue(args.nplaces, &wcQueue);
     }
+ 
  
     while (alarmOn){
         if((bytesread = read( fd, &str, MAX_MSG_LEN - 1)) > 0){
