@@ -9,11 +9,11 @@ pthread_mutex_t placeMutex = PTHREAD_MUTEX_INITIALIZER;
 sem_t nthreads;
 sem_t nplaces;
 
-
 void alarm_handler(int sig){ alarmOn = 0; }
  
 void *thr_funcStandard(void *msgCl){
     pthread_detach(pthread_self());
+    int tries = 0;
     int fd2;
     int placeDef = 0;
     int pid_s = getpid(), pid_cl = 0, i, pl =- 1, dur = 0;
@@ -22,22 +22,21 @@ void *thr_funcStandard(void *msgCl){
        
     //Receives the request in a string and forms privatefifo      
     sscanf((char *) msgCl, "[%d,%d,%ld,%d,%d]", &i, &pid_cl, &tid_cl, &dur, &pl);
-   
     sprintf(privatefifo, "/tmp/%d.%ld", pid_cl, tid_cl);
-    printf("Priavte fifo: %s \n", privatefifo);
     //SENDING ANSWERS TO REQUEST- privatefifo//
-    if ((fd2=open(privatefifo,O_WRONLY)) == -1) {
-        printf("Tid do servidor: %ld\n", tid_s);
-        printf("Tid do cliente: %ld\n", tid_cl);
 
-        printf("Oh dear, something went wrong with read()! %s\n", strerror(errno));
+    while(((fd2=open(privatefifo,O_WRONLY)) <= 0) && tries<5) {
+        usleep(3000);
+        tries++;
+    }
+
+    if(tries == 5){
         regOper("GAVUP", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
         if(args.nthreads){
             sem_post(&nthreads);
         }
         return NULL;
     }
- 
     char msg[MAX_MSG_LEN];
 
    
@@ -58,8 +57,7 @@ void *thr_funcStandard(void *msgCl){
             regOper("ENTER", i, pid_cl, tid_cl, dur, place, (double)(time(NULL) - beginTime));
             sprintf(msg, "[%d,%d,%ld,%d,%d]", i, pid_s, tid_s, dur, place);
         }
-        printf("Tid do servidor: %ld\n", tid_s);
-        printf("Tid do cliente: %ld\n", tid_cl);
+
         if(write(fd2, msg, MAX_MSG_LEN) < 0){
             if(args.nplaces){
                 pthread_mutex_lock(&placeMutex);
@@ -193,13 +191,14 @@ int main(int argc, char *argv[]){
                 dur = 0;
                 tid_cl = 0;
                 pid_cl = 0;
+                char* tmp;
+                tmp = strdup(str);
  
                 sscanf(str, "[%d,%d,%d,%d,%d]", &i, &pid_cl, &tid_cl, &dur, &pl);
                 regOper("RECVD", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
-
                 if(args.nthreads != 0)
                     sem_wait(&nthreads);
-                pthread_create(&tid[k], NULL, thr_funcStandard, str);//sends the read message to the thread
+                pthread_create(&tid[k], NULL, thr_funcStandard, tmp);//sends the read message to the thread
                 k++;
                 if(args.nthreads){
                     k = k % args.nthreads;
@@ -231,7 +230,6 @@ int main(int argc, char *argv[]){
                     j %= args.nthreads;
             }
     }
-
     free(tid);
     close(fd);
     fprintf(stderr,"Bathroom is closed\n");

@@ -75,7 +75,6 @@ void *thr_func(void *num){
         return NULL;
     }
     close(fd2);
-    printf("Destroyed privatefifo: %s , request %d\n", privatefifo, i);
  
     sscanf(str, "[%d,%d,%ld,%d,%d]", &i, &pid_s, &tid_s, &dur, &pl);
     if ((pl == -1) && (dur = -1))
@@ -126,7 +125,7 @@ int main(int argc, char *argv[])
         num[k] = k + 1;
         pthread_create(&tid[k], NULL, thr_func, &num[k]);
         pthread_detach(tid[k]);
-        usleep(10*1000);
+        usleep(30*1000);
         k++;
     }
     fprintf(stderr,"Finished work\n");
