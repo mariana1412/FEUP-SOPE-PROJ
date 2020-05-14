@@ -1,14 +1,33 @@
-# READ ME 
 
-## Objetivos
+# READ ME
+
+## Acesso informático aos Quartos de Banho
+
+### Objetivos
  * criar programas multithread;
  * promover a intercomunicação entre processos através de canais com nome (named pipes ou FIFOs);
  * evitar conflitos entre entidades concorrentes, por via de mecanismos de sincronização.
 
+### Funcionalidades implementadas
+ O programa desenvolvido contém todas as features pretendidas no enunciado, todas a funcionar da forma correta.
 
-## Funcionalidades implementadas
 
-O programa desenvolvido contém todas as features pretendidas no enunciado, todas em geral a funcionar bem.
+### Compilação
+ Para efetuar a compilação do programa, basta executar o comando > make no diretório  principal do projeto. Este comando irá gerar os executáveis necessários, nomeadamente Q2 (servidor) e U2(cliente). 
+
+
+### Execução
+ A execução do programa deve ser feita com a invocação dos executáveis, em terminais separados, com os argumentos devidos:
+
+| Flag          | Descrição           | 
+| ------------ |:-----------------------------------------------------------------------------: |
+| -t nsecs     | nº (aproximado) de segundos que o programa deve funcionar                     |                            |                                                                                              |
+| -l nplaces   | lotação do Quarto de Banho                                                    |                                     |                                                                                              |
+| -n nthreads  | nº (máximo) de threads a atender pedidos                                      |                          |                                                                                              |
+| fifoname     | nome do canal público (FIFO) a criar pelo servidor para atendimento de pedidos|
+                                                                                             
+ * Un <-t nsecs> fifoname
+ * Qn <-t nsecs> [-l nplaces] [-n nthreads] fifoname
 
 ## Detalhes de implementação
 
@@ -19,8 +38,8 @@ O programa desenvolvido contém todas as features pretendidas no enunciado, toda
 * O pedido de um cliente é atendido, independentemente do seu tempo de duração ultrapassar ou não o que resta de execução. Se este pedido foi recebido antes da casa de banho fechar ele é atendido.
 O programa do servidor só termina após responder a todos os pedidos recebidos até fechar.
 
-8
-### Programa do Cliente (U1)
+
+### Programa do Cliente (U2)
 * O programa do cliente lança pedidos com um curto intervalo entre pedidos (15ms),por forma a exacerbar condições de competição. Termina após passar o tempo de execução fornecido pelo utilizador ou até o servidor fechar.
 
 * O cliente tenta aceder ao servidor e se este não estiver disponível, é lançada a mensagem "Oops server is closed" e o programa termina.
@@ -31,7 +50,7 @@ O programa do servidor só termina após responder a todos os pedidos recebidos 
 
 * É criada uma thread por pedido que o envia por um fifo publico, fornecido pelo utilizador, para o servidor e lê a resposta do servidor de um fifo privado criado por esta mesma thread. No final destas ações, esta thread destrói o fifo privado.
 
-### Programa do Servidor (Q1)
+### Programa do Servidor (Q2)
 * O programa do servidor lança uma thread por cada pedido do cliente de modo a atênde-lo.
 
 * A thread criada lê o pedido do cliente e elabora uma resposta para cada pedido recebido.
@@ -68,9 +87,8 @@ Ao longo do programa são exibidas mensagens de tracking no formato “inst;i ; 
 	■ GAVUP- servidor já não consegue responder a pedido porque FIFO privado do cliente fechou
 
 
-## Notas de compilação
 
-O makeFile encontra-se no diretorio principal. Este compila os dois programas simultaneamente.
+
 
 
 
