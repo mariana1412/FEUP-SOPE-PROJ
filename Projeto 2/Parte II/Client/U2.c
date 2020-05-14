@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
         num[k] = k + 1;
         pthread_create(&tid[k], NULL, thr_func, &num[k]);
         pthread_detach(tid[k]);
-        usleep(10*1000);
+        usleep(10000);//10 milisegundos
         k++;
     }
     

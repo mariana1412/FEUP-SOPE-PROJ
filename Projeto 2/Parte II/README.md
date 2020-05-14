@@ -1,4 +1,5 @@
 
+
 # READ ME
 
 ## Acesso informático aos Quartos de Banho
@@ -7,6 +8,9 @@
  * criar programas multithread;
  * promover a intercomunicação entre processos através de canais com nome (named pipes ou FIFOs);
  * evitar conflitos entre entidades concorrentes, por via de mecanismos de sincronização.
+
+### Descrição geral
+Pretende-se obter uma aplicação do tipo cliente-servidor capaz de lidar comsituações de conflito no acesso a zonas partilhadas.A zona partilhada é um Quarto de Banho com vários lugares unisexo,controlado por um processo Q ao qual se dirigem pedidos de acesso deutentes. Os pedidos de acesso são enviados por intermédio de um processomultithreadU (cliente), e neles se indica o tempo que o interessado desejaestar num lugar das instalações sanitárias. Os pedidos ficarão numa fila deatendimento até terem vez; nessa altura, o utente respetivo acede a um lugarnas instalações durante o tempo pedido, sob o controlo do servidor Q; depoiso recurso é libertado para outro utente.A aplicação deve ser desenvolvida em 2 etapas, de complexidade crescente,a segunda baseando-se no bom funcionamento da primeira. No final, e paraavaliação, deverão ser entregues dois pacotes de código (com os programasU/Q), um para cada etapa.
 
 ### Funcionalidades implementadas
  O programa desenvolvido contém todas as features pretendidas no enunciado, todas a funcionar da forma correta.
@@ -33,16 +37,18 @@
 
 * O programa utiliza alarmes para determinar o fim do tempo indicado na chamada do programa.
 
-* Neste momento, não são utilizados mecanismos de sincronização.
+* Como mecanismos de sincronização estão a ser usados tanto *semáforos* como *mutexs*.
 
 * O pedido de um cliente é atendido, independentemente do seu tempo de duração ultrapassar ou não o que resta de execução. Se este pedido foi recebido antes da casa de banho fechar ele é atendido.
-O programa do servidor só termina após responder a todos os pedidos recebidos até fechar.
+O programa do servidor só termina após responder a todos os pedidos recebidos até fechar. 
+
+* Todos os pedidos têm uma resposta.
 
 
 ### Programa do Cliente (U2)
-* O programa do cliente lança pedidos com um curto intervalo entre pedidos (15ms),por forma a exacerbar condições de competição. Termina após passar o tempo de execução fornecido pelo utilizador ou até o servidor fechar.
+* O programa do cliente lança pedidos com um curto intervalo entre pedidos (10ms), por forma a exacerbar condições de competição. Termina após passar o tempo de execução fornecido pelo utilizador ou até o servidor fechar.
 
-* O cliente tenta aceder ao servidor e se este não estiver disponível, é lançada a mensagem "Oops server is closed" e o programa termina.
+* O cliente tenta aceder ao servidor e se este não estiver disponível, é lançada a mensagem (para stderr)  *"Oops server is closed"* e o programa termina.
 
 * Se durante o correr do programa o servidor fechar (após passar o seu tempo de execução), a mesma mensagem é exibida na consola, terminando a geração de pedidos. 
 
@@ -50,12 +56,16 @@ O programa do servidor só termina após responder a todos os pedidos recebidos 
 
 * É criada uma thread por pedido que o envia por um fifo publico, fornecido pelo utilizador, para o servidor e lê a resposta do servidor de um fifo privado criado por esta mesma thread. No final destas ações, esta thread destrói o fifo privado.
 
+* O programa do cliente termina com a mensagem *"Finished work"* enviada para stderr e o programa do servidor termina tambem com uma mensagem enviada para stderr *"Bathroom is closed"*.
+
 ### Programa do Servidor (Q2)
 * O programa do servidor lança uma thread por cada pedido do cliente de modo a atênde-lo.
 
 * A thread criada lê o pedido do cliente e elabora uma resposta para cada pedido recebido.
 
 * Caso o tempo de execução do cliente termine primeiro que o do servidor, o servidor espera o restante tempo e temina após atingir o seu tempo de execução.
+
+* Nesta segunda parte da implementação, o número de lugares disponiveis e o número de threads utilizadas para dar respostas aos pedidos podem já não ser ilimitadas, se assim for especificado pelo utilizador, pelo que são utilizados semáforos e mutexs para lidar com esta nova situação.
 
 ### Mensagens na consola
 
