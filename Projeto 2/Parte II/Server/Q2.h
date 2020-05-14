@@ -16,7 +16,7 @@
 #include <semaphore.h>
 
 #define MAX_MSG_LEN 500
-#define NUM_MAX_THREADS 4096
+#define NUM_MAX_THREADS 8200
 
 void *thr_funcStandard(void *fname);
 void *thr_funcClosed(void *msgCl);

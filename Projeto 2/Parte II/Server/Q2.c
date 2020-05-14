@@ -23,8 +23,8 @@ void *thr_funcStandard(void *msgCl){
     //Receives the request in a string and forms privatefifo      
     sscanf((char *) msgCl, "[%d,%d,%ld,%d,%d]", &i, &pid_cl, &tid_cl, &dur, &pl);
     sprintf(privatefifo, "/tmp/%d.%ld", pid_cl, tid_cl);
-    //SENDING ANSWERS TO REQUEST- privatefifo//
 
+    //SENDING ANSWERS TO THE REQUEST THROUGH privatefifo//
     while(((fd2=open(privatefifo,O_WRONLY)) <= 0) && tries<3) {
         usleep(3000);
         tries++;
@@ -37,11 +37,10 @@ void *thr_funcStandard(void *msgCl){
         }
         return NULL;
     }
+
     char msg[MAX_MSG_LEN];
 
-   
     if(alarmOn){
-      
         if(args.nplaces){
             sem_wait(&nplaces);
             pthread_mutex_lock(&placeMutex);
@@ -87,9 +86,10 @@ void *thr_funcStandard(void *msgCl){
             regOper("TIMUP", i, pid_cl, tid_cl, dur, place, (double)(time(NULL) - beginTime));
         }
     }
-   
     return NULL;
 }
+
+
 void *thr_funcClosed(void *msgCl){
     pthread_detach(pthread_self());
     int fd2;
@@ -99,17 +99,16 @@ void *thr_funcClosed(void *msgCl){
        
     //Receives the request in a string and forms privatefifo      
     sscanf((char *) msgCl, "[%d,%d,%ld,%d,%d]", &i, &pid_cl, &tid_cl, &dur, &pl);
-   
     sprintf(privatefifo, "/tmp/%d.%ld", pid_cl, tid_cl);
  
     //SENDING ANSWERS TO REQUEST- privatefifo//
     if ((fd2=open(privatefifo,O_WRONLY)) == -1) {
-
         regOper("GAVUP", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
         return NULL;
     }
  
     char msg[MAX_MSG_LEN];
+
     if(!alarmOn){
         dur =-1;
         regOper("2LATE", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
@@ -124,11 +123,11 @@ void *thr_funcClosed(void *msgCl){
         } 
     }
     close(fd2);
-     if(args.nthreads){
+    if(args.nthreads){
         sem_post(&nthreads);
     }
  
-    pthread_exit(NULL);
+    return NULL;
 }
 
 int main(int argc, char *argv[]){
@@ -191,15 +190,16 @@ int main(int argc, char *argv[]){
                 dur = 0;
                 tid_cl = 0;
                 pid_cl = 0;
-                char* tmp;
-                tmp = strdup(str);
  
                 sscanf(str, "[%d,%d,%d,%d,%d]", &i, &pid_cl, &tid_cl, &dur, &pl);
                 regOper("RECVD", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
+
                 if(args.nthreads != 0)
                     sem_wait(&nthreads);
-                pthread_create(&tid[k], NULL, thr_funcStandard, tmp);//sends the read message to the thread
+
+                pthread_create(&tid[k], NULL, thr_funcStandard, str);//sends the read message to the thread
                 k++;
+
                 if(args.nthreads){
                     k = k % args.nthreads;
                 }
@@ -208,8 +208,8 @@ int main(int argc, char *argv[]){
     }
 
     if (unlink(args.fifoname) < 0) fprintf(stderr,"Error when destroying FIFO\n");
-    int n=0;
-    int j = k;
+
+    int n=0, j = k;
 
     while((n=read(fd,&str,MAX_MSG_LEN-1)>0)){
         str[bytesread] = '\0';
@@ -226,10 +226,12 @@ int main(int argc, char *argv[]){
                     
                 pthread_create(&tid[j], NULL, thr_funcClosed, str);//sends the read message to the thread
                 j++;
+
                 if(args.nthreads)
                     j %= args.nthreads;
             }
     }
+
     free(tid);
     close(fd);
     fprintf(stderr,"Bathroom is closed\n");

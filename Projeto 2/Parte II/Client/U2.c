@@ -45,7 +45,7 @@ void *thr_func(void *num){
     }
     //
  
-    //READ RESPOSTA//
+    //READ ANSWER//
     if ((fd2 = open(privatefifo, O_RDONLY)) < 0)
     {
         regOper("FAILD", i, pid, tid, dur, pl, (double)(time(NULL) - beginTime));
@@ -99,16 +99,14 @@ int main(int argc, char *argv[])
 
     srand(time(NULL));
  
-    if (argc != 4)
-    {
+    if (argc != 4){
         fprintf(stderr,"Usage: U2 <-t nsecs> fifoname\n");
         exit(1);
     }
  
     initArgumentFlags(&args);
  
-    if (parseArgumentsClient(argc, argv, &args) != 0)
-    {
+    if (parseArgumentsClient(argc, argv, &args) != 0){
         fprintf(stderr,"Usage: U2 <-t nsecs> fifoname\n");
         exit(1);
     }
@@ -121,14 +119,14 @@ int main(int argc, char *argv[])
     alarmOn = 1;
     alarm(args.nsecs);
     
-    while (alarmOn)
-    {
+    while (alarmOn){
         num[k] = k + 1;
         pthread_create(&tid[k], NULL, thr_func, &num[k]);
         pthread_detach(tid[k]);
         usleep(10*1000);
         k++;
     }
+    
     fprintf(stderr,"Finished work\n");
     
     return 0;

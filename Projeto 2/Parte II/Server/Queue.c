@@ -1,6 +1,5 @@
 #include "Queue.h"
 
-
 void createQueue(unsigned capacity, struct Queue* q){
     q->capacity = capacity;
     q->size = 0;
@@ -29,9 +28,11 @@ int size(struct Queue* q) {
    return q->size;
 }  
 
+
+
 // function to insert an element at the rear of the queue 
 void insert(int data, struct Queue* q) {
-   fprintf(stderr,"está livre %d\n", data);
+   //fprintf(stderr,"está livre %d\n", data);
    if(!isFull(q)) {
 	
       if(q->rear == q->capacity - 1 ) {
@@ -42,6 +43,8 @@ void insert(int data, struct Queue* q) {
       q->size++;
    }  
 }
+
+
  // function to delete an element from the front of the queue 
 int removeData(struct Queue *q) {
 
@@ -59,17 +62,19 @@ int removeData(struct Queue *q) {
 
    q->size--;
    q->rear--;
-   fprintf(stderr,"estou na casa de banho %d\n", data);
+   //fprintf(stderr,"estou na casa de banho %d\n", data);
    
    return data;  
 }
 
+
+
 // print queue elements 
 void printQueue(struct Queue *q){
    for(int i = 0;i < q->size; i++){
-      printf("-> %d: %d\n", i, q->queue[i]);
+      fprintf(stderr,"-> %d: %d\n", i, q->queue[i]);
    }
    if(isEmpty(q)){
-      printf("You got it empty\n");
+      fprintf(stderr,"You got it empty\n");
    }
 }
