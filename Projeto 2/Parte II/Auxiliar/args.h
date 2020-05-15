@@ -24,6 +24,7 @@ struct ArgumentFlags{
     char* fifoname;
 };
 
+int isNumber(char *n);
 int idArguments(char *arg);
 int parseArgumentsClient(int argc, char *argv[], struct ArgumentFlags *args);
 int parseArgumentsServer(int argc, char *argv[], struct ArgumentFlags *args);

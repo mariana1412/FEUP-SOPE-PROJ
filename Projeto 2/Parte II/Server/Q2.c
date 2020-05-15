@@ -13,9 +13,9 @@ void alarm_handler(int sig){ alarmOn = 0; }
  
 void *thr_funcStandard(void *msgCl){
     pthread_detach(pthread_self());
-    int tries = 0;
+    
     int fd2;
-    int placeDef = 0;
+    int placeDef = 0, tries = 0;
     int pid_s = getpid(), pid_cl = 0, i, pl =- 1, dur = 0;
     pthread_t tid_s = pthread_self(), tid_cl = 0;
     char privatefifo[MAX_MSG_LEN];
@@ -25,7 +25,7 @@ void *thr_funcStandard(void *msgCl){
     sprintf(privatefifo, "/tmp/%d.%ld", pid_cl, tid_cl);
 
     //SENDING ANSWERS TO THE REQUEST THROUGH privatefifo//
-    while(((fd2=open(privatefifo,O_WRONLY)) <= 0) && tries<3) {
+    while(((fd2=open(privatefifo,O_WRONLY)) <= 0) && tries < 3) {
         usleep(3000);
         tries++;
     }
@@ -58,6 +58,7 @@ void *thr_funcStandard(void *msgCl){
         }
 
         if(write(fd2, msg, MAX_MSG_LEN) < 0){
+            fprintf(stderr, "Error trying to write to the private fifo\n");
             if(args.nplaces){
                 pthread_mutex_lock(&placeMutex);
                 insert(placeDef,&wcQueue);
@@ -238,7 +239,4 @@ int main(int argc, char *argv[]){
     
     pthread_exit(0);
 }
-
-//ps -u para ver o pid 
-//watch -n 0.05 ps -o thcount <pid>
 

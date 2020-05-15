@@ -38,7 +38,7 @@ void insert(int data, struct Queue* q) {
       if(q->rear == q->capacity - 1 ) {
          q->rear = -1;            
       }       
-       // insert element at the rear
+      // insert element at the rear
       q->queue[++q->rear] = data;
       q->size++;
    }  
@@ -54,7 +54,7 @@ int removeData(struct Queue *q) {
    if(q->front == q->capacity) {
       q->front = 0;
    }
-	else{// shift all the elements from index 2 till rear to the left by one 
+	else{ // shift all the elements from index 2 till rear to the left by one 
       for (int i = 0; i < q->rear; i++) { 
          q->queue[i] = q->queue[i + 1]; 
       } 

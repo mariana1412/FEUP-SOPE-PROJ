@@ -9,11 +9,11 @@ int isNumber(char *n) {
     return 1;
 }
 
-int idArguments(char *arg){
+int idArguments(char *arg){ //note: strcmp() returns 0 whent to strings are equal
     char* nsecs = "-t";
     char* nplaces = "-l";
     char* nthreads = "-n";
-    //nota: strcmp() retorn 0 quando são iguais
+    
     if(!strcmp(arg, nsecs)){ 
         return NSECS;
     }
@@ -34,6 +34,8 @@ void initArgumentFlags(struct ArgumentFlags *args){
     args->nplaces = 0;
     args->fifoname = "/tmp/requests";
 }
+
+
 int parseArgumentsClient(int argc, char *argv[], struct ArgumentFlags *args){
     for(int i = 1; i < argc; i++){
         int id = idArguments(argv[i]); 

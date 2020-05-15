@@ -10,14 +10,16 @@
 #include <errno.h>
 #include <string.h>
 #include <pthread.h>
+#include <semaphore.h>
 #include "../Auxiliar/args.h"
 #include "../Auxiliar/utils.h"
 #include "Queue.h"
-#include <semaphore.h>
+
 
 #define MAX_MSG_LEN 500
 #define NUM_MAX_THREADS 8200
 
+void alarm_handler(int sig);
 void *thr_funcStandard(void *fname);
 void *thr_funcClosed(void *msgCl);
 int main(int argc, char *argv[]);

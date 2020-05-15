@@ -15,8 +15,8 @@
 #define MAX_MSG_LEN 255
 #define NUM_MAX_THREADS 8200
 
-void *thr_func(void *fname);
 void alarm_handler(int sig);
+void *thr_func(void *fname);
 int main(int argc, char *argv[]);
 
 #endif /*U2_H*/
