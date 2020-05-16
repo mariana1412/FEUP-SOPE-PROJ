@@ -20,7 +20,7 @@ void *thr_func(void *num){
  
     if (mkfifo(privatefifo, 0660) < 0){
         fprintf(stderr,"Error creating answer fifo\n");
-        exit(2);
+        exit(2); 
     }
  
     //CREATE REQUEST//  
@@ -36,7 +36,7 @@ void *thr_func(void *num){
     }
     else{
         if (write(fd, msg, MAX_MSG_LEN) < 0)
-            exit(2);
+            return NULL;
         regOper("IWANT", i, pid, tid, dur, pl, (double)(time(NULL) - beginTime));
         close(fd);
     }
@@ -47,10 +47,8 @@ void *thr_func(void *num){
         regOper("FAILD", i, pid, tid, dur, pl, (double)(time(NULL) - beginTime));
         close(fd2);
 
-        if (unlink(privatefifo)){
+        if (unlink(privatefifo))
             fprintf(stderr,"Error when destroying private fifo\n");
-            exit(2);
-        }
 
         return NULL;
     }
@@ -66,11 +64,9 @@ void *thr_func(void *num){
         regOper("FAILD", i, pid, tid, dur, pl, (double)(time(NULL) - beginTime));
         close(fd2);
 
-        if (unlink(privatefifo)){   
+        if (unlink(privatefifo)) 
             fprintf(stderr,"Error when destroying private fifo\n");
-            exit(2);
-        }   
-
+    
         return NULL;
     }
 

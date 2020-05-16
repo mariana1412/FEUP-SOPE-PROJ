@@ -13,7 +13,7 @@
 #include <semaphore.h>
 #include "../Auxiliar/args.h"
 #include "../Auxiliar/utils.h"
-#include "Queue.h"
+#include "../Auxiliar/Queue.h"
 
 
 #define MAX_MSG_LEN 500

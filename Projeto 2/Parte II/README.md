@@ -10,7 +10,7 @@
  * evitar conflitos entre entidades concorrentes, por via de mecanismos de sincronização.
 
 ### Descrição geral
-Pretende-se obter uma aplicação do tipo cliente-servidor capaz de lidar comsituações de conflito no acesso a zonas partilhadas.A zona partilhada é um Quarto de Banho com vários lugares unisexo,controlado por um processo Q ao qual se dirigem pedidos de acesso deutentes. Os pedidos de acesso são enviados por intermédio de um processomultithreadU (cliente), e neles se indica o tempo que o interessado desejaestar num lugar das instalações sanitárias. Os pedidos ficarão numa fila deatendimento até terem vez; nessa altura, o utente respetivo acede a um lugarnas instalações durante o tempo pedido, sob o controlo do servidor Q; depoiso recurso é libertado para outro utente.A aplicação deve ser desenvolvida em 2 etapas, de complexidade crescente,a segunda baseando-se no bom funcionamento da primeira. No final, e paraavaliação, deverão ser entregues dois pacotes de código (com os programasU/Q), um para cada etapa.
+Pretende-se obter uma aplicação do tipo cliente-servidor capaz de lidar com situações de conflito no acesso a zonas partilhadas. A zona partilhada é um Quarto de Banho com vários lugares unisexo,controlado por um processo Q ao qual se dirigem pedidos de acesso de utentes. Os pedidos de acesso são enviados por intermédio de um processo multithread U (cliente), e neles se indica o tempo que o interessado deseja estar num lugar das instalações sanitárias. Os pedidos ficarão numa fila de atendimento até terem vez; nessa altura, o utente respetivo acede a um lugar nas instalações durante o tempo pedido, sob o controlo do servidor Q; depois o recurso é libertado para outro utente. 
 
 ### Funcionalidades implementadas
  O programa desenvolvido contém todas as features pretendidas no enunciado, todas a funcionar da forma correta.
@@ -65,7 +65,7 @@ O programa do servidor só termina após responder a todos os pedidos recebidos 
 
 * Caso o tempo de execução do cliente termine primeiro que o do servidor, o servidor espera o restante tempo e temina após atingir o seu tempo de execução.
 
-* Nesta segunda parte da implementação, o número de lugares disponiveis e o número de threads utilizadas para dar respostas aos pedidos podem já não ser ilimitadas, se assim for especificado pelo utilizador, pelo que são utilizados semáforos e mutexs para lidar com esta nova situação.
+* Nesta segunda parte da implementação, o número de lugares disponíveis e o número de threads utilizadas para dar respostas aos pedidos podem já não ser ilimitadas, se assim for especificado pelo utilizador, pelo que são utilizados semáforos e mutexs para lidar com esta nova situação.
 
 ### Mensagens na consola
 

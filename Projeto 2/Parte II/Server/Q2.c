@@ -148,7 +148,7 @@ int main(int argc, char *argv[]){
         exit(1);
     }
 
-    checkFlags(&args);
+    //checkFlags(&args);
 
 
     beginTime = time(NULL);
