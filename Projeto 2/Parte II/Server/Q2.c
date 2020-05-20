@@ -6,6 +6,7 @@ int place=0;
 static clock_t beginTime; 
 static struct Queue wcQueue;
 pthread_mutex_t placeMutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t strMutex = PTHREAD_MUTEX_INITIALIZER;
 sem_t nthreads;
 sem_t nplaces;
 
@@ -21,8 +22,8 @@ void *thr_funcStandard(void *msgCl){
     char privatefifo[MAX_MSG_LEN];
        
     //Receives the request in a string and forms privatefifo      
-    sscanf((char *) msgCl, "[%d,%d,%ld,%d,%d]", &i, &pid_cl, &tid_cl, &dur, &pl);
-    sprintf(privatefifo, "/tmp/%d.%ld", pid_cl, tid_cl);
+    sscanf((char *) msgCl, "[%d,%d,%lu,%d,%d]", &i, &pid_cl, &tid_cl, &dur, &pl);
+    sprintf(privatefifo, "/tmp/%d.%lu", pid_cl, tid_cl);
 
     //SENDING ANSWERS TO THE REQUEST THROUGH privatefifo//
     while(((fd2=open(privatefifo,O_WRONLY)) <= 0) && tries < 3) {
@@ -47,18 +48,22 @@ void *thr_funcStandard(void *msgCl){
             placeDef = removeData(&wcQueue);
             pthread_mutex_unlock(&placeMutex);
             regOper("ENTER", i, pid_cl, tid_cl, dur, placeDef, (double)(time(NULL) - beginTime));
-            sprintf(msg, "[%d,%d,%ld,%d,%d]", i, pid_s, tid_s, dur, placeDef);
+            printf("Enter 1 on %d\n", i);
+            sprintf(msg, "[%d,%d,%lu,%d,%d]", i, pid_s, tid_s, dur, placeDef);
+            
         }
         else{
             pthread_mutex_lock(&placeMutex);
             place++;
             pthread_mutex_unlock(&placeMutex);
             regOper("ENTER", i, pid_cl, tid_cl, dur, place, (double)(time(NULL) - beginTime));
-            sprintf(msg, "[%d,%d,%ld,%d,%d]", i, pid_s, tid_s, dur, place);
+            sprintf(msg, "[%d,%d,%lu,%d,%d]", i, pid_s, tid_s, dur, place);
         }
 
-        if(write(fd2, msg, MAX_MSG_LEN) < 0){
+        printf("Before write on %i\n", i);
+        if(write(fd2, msg, MAX_MSG_LEN) <= 0){
             fprintf(stderr, "Error trying to write to the private fifo\n");
+            printf("Inside write on %d\n", i);
             if(args.nplaces){
                 pthread_mutex_lock(&placeMutex);
                 insert(placeDef,&wcQueue);
@@ -71,6 +76,7 @@ void *thr_funcStandard(void *msgCl){
             close(fd2);
             return NULL;
         }
+        printf("After write on %d\n", i);
         usleep(dur);
         close(fd2);
         if(args.nthreads){
@@ -87,7 +93,8 @@ void *thr_funcStandard(void *msgCl){
             regOper("TIMUP", i, pid_cl, tid_cl, dur, place, (double)(time(NULL) - beginTime));
         }
     }
-    return NULL;
+    printf("Exiting on %d\n", i);
+    pthread_exit(NULL);
 }
 
 
@@ -99,8 +106,8 @@ void *thr_funcClosed(void *msgCl){
     char privatefifo[MAX_MSG_LEN];
        
     //Receives the request in a string and forms privatefifo      
-    sscanf((char *) msgCl, "[%d,%d,%ld,%d,%d]", &i, &pid_cl, &tid_cl, &dur, &pl);
-    sprintf(privatefifo, "/tmp/%d.%ld", pid_cl, tid_cl);
+    sscanf((char *) msgCl, "[%d,%d,%lu,%d,%d]", &i, &pid_cl, &tid_cl, &dur, &pl);
+    sprintf(privatefifo, "/tmp/%d.%lu", pid_cl, tid_cl);
  
     //SENDING ANSWERS TO REQUEST- privatefifo//
     if ((fd2=open(privatefifo,O_WRONLY)) == -1) {
@@ -113,7 +120,7 @@ void *thr_funcClosed(void *msgCl){
     if(!alarmOn){
         dur =-1;
         regOper("2LATE", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
-        sprintf(msg, "[%d,%d,%ld,%d,%d]", i, pid_s, tid_s, dur,pl);
+        sprintf(msg, "[%d,%d,%lu,%d,%d]", i, pid_s, tid_s, dur,pl);
         if(write(fd2, msg, MAX_MSG_LEN) < 0){
             regOper("GAVUP", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
             close(fd2);
@@ -132,10 +139,16 @@ void *thr_funcClosed(void *msgCl){
 }
 
 int main(int argc, char *argv[]){
-    int fd, i, pid_cl, tid_cl, dur, pl, k=0, bytesread;
+
+    setbuf(stdout, NULL);
+
+    int fd, i, pid_cl, dur, pl, k=0, bytesread;
     char str[MAX_MSG_LEN];    
-    pthread_t* tid;
-   
+    pthread_t *tid;
+    pthread_t tid_cl;
+    
+    
+
     if (argc != 4 && argc != 6 && argc != 8) {
         fprintf(stderr,"Usage: Q2 <-t nsecs> [-l nplaces] [-n nthreads] fifoname\n");
         exit(1);
@@ -176,7 +189,7 @@ int main(int argc, char *argv[]){
         tid = malloc(sizeof(pthread_t)*args.nthreads);
     }
     else
-        tid = malloc(sizeof(pthread_t)*NUM_MAX_THREADS);
+       tid = malloc(sizeof(pthread_t)*NUM_MAX_THREADS);
 
     if (args.nplaces != 0) {
         sem_init(&nplaces, 0, args.nplaces);
@@ -192,18 +205,23 @@ int main(int argc, char *argv[]){
                 tid_cl = 0;
                 pid_cl = 0;
  
-                sscanf(str, "[%d,%d,%d,%d,%d]", &i, &pid_cl, &tid_cl, &dur, &pl);
+                pthread_mutex_lock(&strMutex);
+                sscanf(str, "[%d,%d,%lu,%d,%d]", &i, &pid_cl, &tid_cl, &dur, &pl);
                 regOper("RECVD", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
 
                 if(args.nthreads != 0)
                     sem_wait(&nthreads);
+                
+
 
                 pthread_create(&tid[k], NULL, thr_funcStandard, str);//sends the read message to the thread
+                pthread_mutex_unlock(&strMutex);
                 k++;
 
                 if(args.nthreads){
                     k = k % args.nthreads;
                 }
+                 pthread_mutex_unlock(&strMutex);
             }
         }
     }
@@ -219,21 +237,28 @@ int main(int argc, char *argv[]){
                 tid_cl = 0;
                 pid_cl = 0;
  
-                sscanf(str, "[%d,%d,%d,%d,%d]", &i, &pid_cl, &tid_cl, &dur, &pl);
+
+                pthread_mutex_lock(&strMutex);
+                sscanf(str, "[%d,%d,%lu,%d,%d]", &i, &pid_cl, &tid_cl, &dur, &pl);
                 regOper("RECVD", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
 
                 if(args.nthreads != 0)
                     sem_wait(&nthreads);
+
+                
                     
                 pthread_create(&tid[j], NULL, thr_funcClosed, str);//sends the read message to the thread
+                pthread_mutex_unlock(&strMutex);
                 j++;
 
                 if(args.nthreads)
                     j %= args.nthreads;
+                    
+               pthread_mutex_unlock(&strMutex);
             }
     }
 
-    free(tid);
+    //free(tid);
     close(fd);
     fprintf(stderr,"Bathroom is closed\n");
     

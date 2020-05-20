@@ -16,7 +16,7 @@ void *thr_func(void *num){
  
     
     char privatefifo[MAX_MSG_LEN];
-    sprintf(privatefifo, "/tmp/%d.%ld", pid, tid);
+    sprintf(privatefifo, "/tmp/%d.%lu", pid, tid);
  
     if (mkfifo(privatefifo, 0660) < 0){
         fprintf(stderr,"Error creating answer fifo\n");
@@ -26,7 +26,7 @@ void *thr_func(void *num){
     //CREATE REQUEST//  
     char msg[MAX_MSG_LEN];
  
-    sprintf(msg, "[%d,%d,%ld,%d,%d]", i, pid, tid, dur, pl);
+    sprintf(msg, "[%d,%d,%lu,%d,%d]", i, pid, tid, dur, pl);
  
     if ((fd = open(fifoname, O_WRONLY)) < 0){
         fprintf(stderr, "Oops server is closed\n");
@@ -72,7 +72,7 @@ void *thr_func(void *num){
 
     close(fd2);
  
-    sscanf(str, "[%d,%d,%ld,%d,%d]", &i, &pid_s, &tid_s, &dur, &pl);
+    sscanf(str, "[%d,%d,%lu,%d,%d]", &i, &pid_s, &tid_s, &dur, &pl);
 
     if ((pl == -1) && (dur = -1))
         regOper("CLOSD", i, pid_s, tid_s, dur, pl, (double)(time(NULL) - beginTime));
@@ -118,7 +118,7 @@ int main(int argc, char *argv[]){
         num[k] = k + 1;
         pthread_create(&tid[k], NULL, thr_func, &num[k]);
         pthread_detach(tid[k]);
-        usleep(10000);//10 miliseconds
+        usleep(15000);//10 miliseconds
         k++;
     }
     
