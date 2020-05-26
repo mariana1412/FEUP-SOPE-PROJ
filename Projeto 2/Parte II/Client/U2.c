@@ -8,6 +8,7 @@ static clock_t beginTime;
 void alarm_handler(int sig){ alarmOn = 0;}
  
 void *thr_func(void *num){
+    pthread_detach(pthread_self());
     int fd, fd2, pl = -1, tries = 0;
     int pid = getpid(), pid_s;
     int i = *(int *)num;
@@ -32,11 +33,12 @@ void *thr_func(void *num){
         fprintf(stderr, "Oops server is closed\n");
         regOper("CLOSD", i, pid, tid, dur, pl, (double)(time(NULL) - beginTime));
         alarmOn = 0;
-        return NULL;
+        pthread_exit(NULL);
     }
     else{
-        if (write(fd, msg, MAX_MSG_LEN) < 0)
-            return NULL;
+        if (write(fd, msg, MAX_MSG_LEN) < 0){
+           pthread_exit(NULL);
+        }
         regOper("IWANT", i, pid, tid, dur, pl, (double)(time(NULL) - beginTime));
         close(fd);
     }
@@ -47,27 +49,27 @@ void *thr_func(void *num){
         regOper("FAILD", i, pid, tid, dur, pl, (double)(time(NULL) - beginTime));
         close(fd2);
 
-        if (unlink(privatefifo))
+        if (unlink(privatefifo) < 0)
             fprintf(stderr,"Error when destroying private fifo\n");
 
-        return NULL;
+        pthread_exit(NULL);
     }
  
     char str[MAX_MSG_LEN];
  
-    while((read(fd2, str, MAX_MSG_LEN) <= 0) && tries<3) {
+    while((read(fd2, str, MAX_MSG_LEN) <= 0) && tries<5) {
         usleep(3000);
         tries++;   
     }
 
-    if(tries == 3){
+    if(tries == 5){
         regOper("FAILD", i, pid, tid, dur, pl, (double)(time(NULL) - beginTime));
         close(fd2);
 
-        if (unlink(privatefifo)) 
+        if (unlink(privatefifo)<0) 
             fprintf(stderr,"Error when destroying private fifo\n");
     
-        return NULL;
+        pthread_exit(NULL);
     }
 
     close(fd2);
@@ -79,14 +81,17 @@ void *thr_func(void *num){
     else
         regOper("IAMIN", i, pid_s, tid_s, dur, pl, (double)(time(NULL) - beginTime));
     
-    ////
+
     if (unlink(privatefifo)< 0)
         fprintf(stderr,"Error when destroying private fifo\n");
  
-    return NULL;
+    pthread_exit(NULL);
 }
  
 int main(int argc, char *argv[]){
+
+    setbuf(stdout, NULL);
+
     struct ArgumentFlags args;
     pthread_t tid[NUM_MAX_THREADS];
     int num[NUM_MAX_THREADS], k = 0;
@@ -106,7 +111,6 @@ int main(int argc, char *argv[]){
         exit(1);
     }
     
-
     strcpy(fifoname, args.fifoname);
 
     beginTime = time(NULL);
@@ -117,12 +121,12 @@ int main(int argc, char *argv[]){
     while (alarmOn){
         num[k] = k + 1;
         pthread_create(&tid[k], NULL, thr_func, &num[k]);
-        pthread_detach(tid[k]);
-        usleep(15000);//10 miliseconds
+        usleep(20000);//10 miliseconds
         k++;
     }
     
     fprintf(stderr,"Finished work\n");
+    
     
     return 0;
 }
