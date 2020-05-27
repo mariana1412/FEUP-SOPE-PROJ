@@ -6,7 +6,6 @@ int place=0;
 static clock_t beginTime; 
 static struct Queue wcQueue;
 pthread_mutex_t placeMutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t strMutex = PTHREAD_MUTEX_INITIALIZER;
 sem_t nthreads;
 sem_t nplaces;
 
@@ -182,8 +181,6 @@ int main(int argc, char *argv[]){
 
     if (args.nthreads != 0) {
         sem_init(&nthreads, 0, args.nthreads);                
-
-
         tid = malloc(sizeof(pthread_t)*args.nthreads);
     }
     else
@@ -203,7 +200,6 @@ int main(int argc, char *argv[]){
                 tid_cl = 0;
                 pid_cl = 0;
  
-                pthread_mutex_lock(&strMutex);
                 sscanf(str, "[%d,%d,%lu,%d,%d]", &i, &pid_cl, &tid_cl, &dur, &pl);
                 regOper("RECVD", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
 
@@ -211,13 +207,12 @@ int main(int argc, char *argv[]){
                     sem_wait(&nthreads);
 
                 pthread_create(&tid[k], NULL, thr_funcStandard, str);//sends the read message to the thread
-                pthread_mutex_unlock(&strMutex);
                 k++;
 
                 if(args.nthreads){
                     k = k % args.nthreads;
                 }
-                 pthread_mutex_unlock(&strMutex);
+                
             }
         }
     }
@@ -234,7 +229,6 @@ int main(int argc, char *argv[]){
                 pid_cl = 0;
  
 
-                pthread_mutex_lock(&strMutex);
                 sscanf(str, "[%d,%d,%lu,%d,%d]", &i, &pid_cl, &tid_cl, &dur, &pl);
                 regOper("RECVD", i, pid_cl, tid_cl, dur, pl, (double)(time(NULL) - beginTime));
 
@@ -242,17 +236,15 @@ int main(int argc, char *argv[]){
                     sem_wait(&nthreads);
                    
                 pthread_create(&tid[j], NULL, thr_funcClosed, str);//sends the read message to the thread
-                pthread_mutex_unlock(&strMutex);
                 j++;
 
                 if(args.nthreads)
                     j %= args.nthreads;
                     
-               pthread_mutex_unlock(&strMutex);
             }
     }
 
-    //free(tid);
+    free(tid);
     close(fd);
     fprintf(stderr,"Bathroom is closed\n");
     

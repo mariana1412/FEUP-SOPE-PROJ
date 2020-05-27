@@ -8,7 +8,7 @@ static clock_t beginTime;
 void alarm_handler(int sig){ alarmOn = 0;}
  
 void *thr_func(void *num){
-    pthread_detach(pthread_self());
+    pthread_detach(pthread_self());//acrescentado
     int fd, fd2, pl = -1, tries = 0;
     int pid = getpid(), pid_s;
     int i = *(int *)num;
@@ -90,7 +90,7 @@ void *thr_func(void *num){
  
 int main(int argc, char *argv[]){
 
-    setbuf(stdout, NULL);
+    setbuf(stdout, NULL);//acrescentado
 
     struct ArgumentFlags args;
     pthread_t tid[NUM_MAX_THREADS];
@@ -121,7 +121,7 @@ int main(int argc, char *argv[]){
     while (alarmOn){
         num[k] = k + 1;
         pthread_create(&tid[k], NULL, thr_func, &num[k]);
-        usleep(20000);//10 miliseconds
+        usleep(20000);//20 miliseconds
         k++;
     }
     
